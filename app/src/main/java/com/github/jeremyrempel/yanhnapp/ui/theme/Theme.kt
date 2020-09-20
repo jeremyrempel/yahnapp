@@ -1,22 +1,23 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-    primary = purple200,
-    primaryVariant = purple700,
-    secondary = teal200,
+    primary = orangeDark,
+    primaryVariant = orange,
+    secondary = Color.Red,
 //    surface = hnOrange
 )
 
 private val LightColorPalette = lightColors(
-    primary = hnOrange,
-    primaryVariant = purple700,
-    secondary = teal200
+    primary = orange,
+    primaryVariant = orangeDark,
+    secondary = orangeLight
 
     /* Other default colors to override
 background = Color.White,

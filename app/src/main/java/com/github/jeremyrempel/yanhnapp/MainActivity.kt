@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.ui.PostsList
 import com.github.jeremyrempel.yanhnapp.ui.ViewOne
-import com.github.jeremyrempel.yanhnapp.ui.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

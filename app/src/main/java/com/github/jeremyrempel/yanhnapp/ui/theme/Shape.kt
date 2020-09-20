@@ -1,4 +1,4 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

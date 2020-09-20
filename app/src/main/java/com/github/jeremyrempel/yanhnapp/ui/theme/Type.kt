@@ -1,4 +1,4 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

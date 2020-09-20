@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.Post
@@ -30,14 +29,17 @@ fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
 
 @Composable
 fun PostRow(post: Post, callback: (Post) -> Unit) {
-    Row(modifier = Modifier.clickable(onClick = { callback(post) })) {
-        Text(String.format("%d.", post.rank))
+    Row(
+        modifier = Modifier.clickable(onClick = { callback(post) })
+    ) {
+        Text(
+            text = String.format("%d.", post.rank), style = MaterialTheme.typography.h6
+
+        )
         Column(modifier = Modifier.padding(horizontal = 5.dp)) {
             Text(
                 text = post.title,
-                style = TextStyle(
-                    fontSize = TextUnit.Sp(15)
-                )
+                style = MaterialTheme.typography.h6
             )
 
             Row {
@@ -47,13 +49,11 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
                         post.domain, post.points, post.ageHours, post.commentsCnt
                     ),
                     color = Color.Gray,
-                    style = TextStyle(
-                        fontSize = TextUnit.Sp(10)
-                    )
+                    style = MaterialTheme.typography.body1
                 )
             }
 
-            Spacer(modifier = Modifier.preferredHeight(3.dp))
+            Spacer(modifier = Modifier.preferredHeight(8.dp))
         }
     }
 }
@@ -61,5 +61,5 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PostsRow() {
-    PostRow(post = getSample()[0], callback = {})
+    PostsList(data = getSample(), callback = {})
 }
