@@ -1,4 +1,4 @@
-package com.example.yanhnapp
+package com.github.jeremyrempel.yanhnapp
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

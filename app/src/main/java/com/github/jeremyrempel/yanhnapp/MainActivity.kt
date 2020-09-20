@@ -1,4 +1,4 @@
-package com.example.yanhnapp
+package com.github.jeremyrempel.yanhnapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -30,7 +30,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.example.yanhnapp.ui.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.ui.YetAnotherHNAppTheme
+import com.github.yanhnapp.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

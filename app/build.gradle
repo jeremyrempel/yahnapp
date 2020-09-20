@@ -7,7 +7,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "com.example.yanhnapp"
+        applicationId "com.github.jeremyrempel.yanhnapp"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
@@ -35,7 +35,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.4.0'
     }
     lintOptions {
         abortOnError true
