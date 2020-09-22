@@ -78,10 +78,6 @@ fun MultipleComments(comments: List<Comment>) {
                 .wrapContentWidth(Alignment.End)
         ) {
             comments.forEach { SingleComment(comment = it) }
-
-            Text(
-                text = "world"
-            )
         }
     }
 }
