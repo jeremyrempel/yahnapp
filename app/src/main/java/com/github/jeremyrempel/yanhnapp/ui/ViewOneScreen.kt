@@ -4,6 +4,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -20,6 +21,7 @@ import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 const val TAB_CONTENT = 0
 const val TAB_COMMENTS = 1
 
+@ExperimentalLayout
 @Composable
 fun ViewOne() {
     val selectedTab = remember { mutableStateOf(TAB_CONTENT) }
@@ -62,11 +64,13 @@ fun ViewOneContent() {
     )
 }
 
+@ExperimentalLayout
 @Composable
 fun ViewOneComments() {
-    Text("Comments")
+    CommentPreview()
 }
 
+@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun ViewOnePreview() {

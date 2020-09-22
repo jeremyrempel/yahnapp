@@ -60,6 +60,6 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun PostsRow() {
+fun PostsRowPreview() {
     PostsList(data = getSample(), callback = {})
 }

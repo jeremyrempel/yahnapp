@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -23,6 +24,7 @@ import com.github.jeremyrempel.yanhnapp.ui.ViewOne
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 class MainActivity : AppCompatActivity() {
+    @ExperimentalLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+@ExperimentalLayout
 @Composable
 fun MainScreen(data: List<Post>) {
     val currentScreen = remember { mutableStateOf("list") }
@@ -82,6 +85,7 @@ fun MainScreen(data: List<Post>) {
     }
 }
 
+@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun MainListPreview() {
@@ -90,6 +94,7 @@ fun MainListPreview() {
     }
 }
 
+@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun MainListDarkPreview() {
