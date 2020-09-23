@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.ui.tooling.preview.Preview
@@ -32,13 +33,13 @@ fun ViewOne() {
                 selected = selectedTab.value == TAB_CONTENT,
                 onClick = { selectedTab.value = TAB_CONTENT }
             ) {
-                Text(getString(R.string.content_title))
+                Text(stringResource(R.string.content_title))
             }
             Tab(
                 selected = selectedTab.value == TAB_COMMENTS,
                 onClick = { selectedTab.value = TAB_COMMENTS }
             ) {
-                Text(getString(R.string.comments_title))
+                Text(stringResource(R.string.comments_title))
             }
         }
 

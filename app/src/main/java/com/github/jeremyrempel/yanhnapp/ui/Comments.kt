@@ -40,7 +40,7 @@ fun SingleComment(comment: Comment) {
                 modifier = Modifier.padding(end = 10.dp)
             )
             Text(
-                text = "${comment.ageHours} hours ago",
+                text = "${comment.ageHours} hours ago", // todo make string resource
                 style = MaterialTheme.typography.subtitle1
             )
         }
