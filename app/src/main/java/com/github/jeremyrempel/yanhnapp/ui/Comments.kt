@@ -1,7 +1,8 @@
 package com.github.jeremyrempel.yanhnapp.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -12,10 +13,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,9 +56,9 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
         Row(
             modifier = modifier.align(Alignment.End)
         ) {
-            if (comment.hasMore > 0) {
+            if (comment.children.isNotEmpty()) {
                 Text(
-                    text = comment.hasMore.toString(),
+                    text = comment.children.size.toString(),
                     color = Color.Gray,
                     style = MaterialTheme.typography.subtitle1,
                     modifier = modifier.align(Alignment.CenterVertically)
@@ -69,22 +73,33 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun MultipleComments(comments: List<Comment>, modifier: Modifier = Modifier) {
-    ScrollableColumn {
-        comments.forEach { comment ->
-            CommentAndLevel(level = comment.level, comment, modifier)
-        }
+fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
+    LazyColumnFor(items = comments, modifier = modifier) { comment ->
+        CommentTree(level = 0, comment = comment, modifier = modifier)
     }
 }
 
 @ExperimentalLayout
+@ExperimentalAnimationApi
 @Composable
-fun CommentAndLevel(level: Int, comment: Comment, modifier: Modifier) {
+fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
+
+    val showChildren = remember { mutableStateOf(true) }
+
     Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
         CommentLevelDivider(level = level, modifier = modifier)
         SingleComment(comment = comment, modifier)
+    }
+
+    AnimatedVisibility(visible = showChildren.value) {
+        Column {
+            comment.children.forEach {
+                CommentTree(level = level + 1, comment = it, modifier = modifier)
+            }
+        }
     }
 }
 
@@ -100,33 +115,37 @@ fun CommentLevelDivider(level: Int, modifier: Modifier) {
     Spacer(modifier = modifier.preferredWidth(10.dp))
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun CommentPreview() {
     YetAnotherHNAppTheme {
-        MultipleComments(
+        CommentList(
             comments = listOf(
                 Comment(
                     "En",
                     6,
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                    8,
-                    0
-                ),
-                Comment(
-                    "En",
-                    6,
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                    1,
-                    1
-                ),
-                Comment(
-                    "Joe",
-                    4,
-                    "I'm a short one liner",
-                    0,
-                    2
+                    "L1: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                    listOf(
+                        Comment(
+                            "Kaiman",
+                            6,
+                            "L2: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                            listOf(
+                                Comment(
+                                    "Nikido",
+                                    4,
+                                    "L3: I'm a short one liner reply",
+                                ),
+                                Comment(
+                                    "Ebisu",
+                                    1,
+                                    "L3: I'm another reply",
+                                )
+                            )
+                        )
+                    )
                 ),
             )
         )
@@ -138,6 +157,5 @@ data class Comment(
     val userName: String,
     val ageHours: Int,
     val content: String,
-    val hasMore: Int,
-    val level: Int
+    val children: List<Comment> = emptyList()
 )
