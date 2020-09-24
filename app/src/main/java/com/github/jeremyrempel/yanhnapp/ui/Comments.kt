@@ -27,17 +27,17 @@ import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 @Composable
-fun SingleComment(comment: Comment) {
+fun SingleComment(comment: Comment, modifier: Modifier) {
     Column(
-        modifier = Modifier.padding(5.dp)
+        modifier = modifier.padding(5.dp)
     ) {
         Row(
-            modifier = Modifier.padding(bottom = 6.dp)
+            modifier = modifier.padding(bottom = 6.dp)
         ) {
             Text(
                 text = comment.userName,
                 style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = modifier.padding(end = 10.dp)
             )
             Text(
                 text = "${comment.ageHours} hours ago", // todo make string resource
@@ -50,14 +50,14 @@ fun SingleComment(comment: Comment) {
         )
 
         Row(
-            modifier = Modifier.align(Alignment.End)
+            modifier = modifier.align(Alignment.End)
         ) {
             if (comment.hasMore > 0) {
                 Text(
                     text = comment.hasMore.toString(),
                     color = Color.Gray,
                     style = MaterialTheme.typography.subtitle1,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = modifier.align(Alignment.CenterVertically)
                 )
 
                 Image(
@@ -71,25 +71,33 @@ fun SingleComment(comment: Comment) {
 
 @ExperimentalLayout
 @Composable
-fun MultipleComments(comments: List<Comment>) {
-
+fun MultipleComments(comments: List<Comment>, modifier: Modifier = Modifier) {
     ScrollableColumn {
         comments.forEach { comment ->
-            Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
-
-                for (i in 0 until comment.level) {
-                    Spacer(modifier = Modifier.preferredWidth(10.dp))
-                    Divider(
-                        color = MaterialTheme.colors.secondary,
-                        modifier = Modifier.fillMaxHeight().preferredWidth(3.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.preferredWidth(10.dp))
-
-                SingleComment(comment = comment)
-            }
+            CommentAndLevel(level = comment.level, comment, modifier)
         }
     }
+}
+
+@ExperimentalLayout
+@Composable
+fun CommentAndLevel(level: Int, comment: Comment, modifier: Modifier) {
+    Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
+        CommentLevelDivider(level = level, modifier = modifier)
+        SingleComment(comment = comment, modifier)
+    }
+}
+
+@Composable
+fun CommentLevelDivider(level: Int, modifier: Modifier) {
+    for (i in 0 until level) {
+        Spacer(modifier = modifier.preferredWidth(10.dp))
+        Divider(
+            color = MaterialTheme.colors.secondary,
+            modifier = modifier.fillMaxHeight().preferredWidth(3.dp)
+        )
+    }
+    Spacer(modifier = modifier.preferredWidth(10.dp))
 }
 
 @ExperimentalLayout
