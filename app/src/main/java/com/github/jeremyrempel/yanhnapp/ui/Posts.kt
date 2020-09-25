@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.github.jeremyrempel.yanhnapp.Post
-import com.github.jeremyrempel.yanhnapp.getSample
+import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 
 @Composable
 fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {

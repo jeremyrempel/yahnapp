@@ -28,7 +28,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,6 +39,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.models.Comment
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 const val animationTime = 300
@@ -213,11 +213,3 @@ fun CommentPreview() {
         )
     }
 }
-
-@Immutable
-data class Comment(
-    val userName: String,
-    val ageHours: Int,
-    val content: String,
-    val children: List<Comment> = emptyList()
-)
