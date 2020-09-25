@@ -1,4 +1,4 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.screens
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable

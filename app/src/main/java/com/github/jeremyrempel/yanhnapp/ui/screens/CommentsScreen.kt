@@ -1,4 +1,4 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi

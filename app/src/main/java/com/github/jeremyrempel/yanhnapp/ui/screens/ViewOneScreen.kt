@@ -1,4 +1,4 @@
-package com.github.jeremyrempel.yanhnapp.ui
+package com.github.jeremyrempel.yanhnapp.ui.screens
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
