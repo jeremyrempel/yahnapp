@@ -2,6 +2,7 @@ package com.github.jeremyrempel.yanhnapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -24,6 +25,7 @@ import com.github.jeremyrempel.yanhnapp.ui.ViewOne
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 class MainActivity : AppCompatActivity() {
+    @ExperimentalAnimationApi
     @ExperimentalLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
 fun MainScreen(data: List<Post>) {
@@ -85,8 +88,9 @@ fun MainScreen(data: List<Post>) {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
-@Preview(showBackground = true)
+@Preview(showBackground = true, showDecoration = true)
 @Composable
 fun MainListPreview() {
     YetAnotherHNAppTheme(false) {
@@ -94,8 +98,9 @@ fun MainListPreview() {
     }
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
-@Preview(showBackground = true)
+@Preview(showBackground = true, showDecoration = true)
 @Composable
 fun MainListDarkPreview() {
     YetAnotherHNAppTheme(true) {

@@ -2,6 +2,7 @@ package com.github.jeremyrempel.yanhnapp.ui
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -22,6 +23,7 @@ import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 const val TAB_CONTENT = 0
 const val TAB_COMMENTS = 1
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
 fun ViewOne() {
@@ -65,12 +67,14 @@ fun ViewOneContent() {
     )
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
 fun ViewOneComments() {
     CommentPreview()
 }
 
+@ExperimentalAnimationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
