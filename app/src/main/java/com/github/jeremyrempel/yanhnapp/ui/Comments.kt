@@ -42,7 +42,7 @@ import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
-const val animationTime = 500
+const val animationTime = 300
 
 @Composable
 fun SingleComment(comment: Comment, modifier: Modifier) {
@@ -144,7 +144,8 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
             animSpec = TweenSpec(animationTime),
         ),
         exit = slideOutVertically(
-            animSpec = TweenSpec(animationTime)
+            targetOffsetY = { -40 },
+            animSpec = TweenSpec(animationTime),
         ) + shrinkVertically(
             animSpec = TweenSpec(animationTime)
         ) + fadeOut(
