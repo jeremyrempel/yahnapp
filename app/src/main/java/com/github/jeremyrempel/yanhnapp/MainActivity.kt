@@ -13,14 +13,10 @@ import com.github.jeremyrempel.yanhnapp.ui.screens.MainScreen
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity() {
 
