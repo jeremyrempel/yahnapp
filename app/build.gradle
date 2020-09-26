@@ -52,6 +52,9 @@ dependencies {
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.ui:ui-tooling:$compose_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0-alpha07'
+
+    implementation "com.jakewharton.timber:timber:$timber_version"
+
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
