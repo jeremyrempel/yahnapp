@@ -1,6 +1,5 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
-import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Text
@@ -15,9 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 const val TAB_CONTENT = 0
@@ -26,7 +26,7 @@ const val TAB_COMMENTS = 1
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun ViewOne() {
+fun ViewOne(post: Post) {
     val selectedTab = remember { mutableStateOf(TAB_CONTENT) }
 
     Column {
@@ -46,7 +46,7 @@ fun ViewOne() {
         }
 
         if (selectedTab.value == TAB_CONTENT) {
-            ViewOneContent()
+            ViewOneContent(post.url)
         } else {
             ViewOneComments()
         }
@@ -54,17 +54,11 @@ fun ViewOne() {
 }
 
 @Composable
-fun ViewOneContent() {
-    AndroidView(
-        viewBlock = { ctx ->
-            val webView = WebView(ctx)
-            val webViewClient = WebViewClient()
-            webView.webViewClient = webViewClient
-            webView.loadUrl("https://google.com")
+fun ViewOneContent(url: String) {
+    val ctx = remember { WebContext() }
+    val client = remember { WebViewClient() }
 
-            webView
-        }
-    )
+    WebComponent(url = url, webViewClient = client, webContext = ctx)
 }
 
 @ExperimentalAnimationApi
@@ -80,6 +74,6 @@ fun ViewOneComments() {
 @Composable
 fun ViewOnePreview() {
     YetAnotherHNAppTheme(false) {
-        ViewOne()
+        ViewOne(getSample()[0])
     }
 }
