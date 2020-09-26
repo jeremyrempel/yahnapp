@@ -1,2 +1,3 @@
 rootProject.name = "Yet Another HN App"
 include ':app'
+include ':libapi'
