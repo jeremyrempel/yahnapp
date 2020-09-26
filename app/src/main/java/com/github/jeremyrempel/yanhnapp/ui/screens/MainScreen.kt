@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ContextAmbient
@@ -19,6 +20,57 @@ import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import kotlinx.coroutines.flow.Flow
+
+@ExperimentalAnimationApi
+@ExperimentalLayout
+@Composable
+fun MainScreen(flow: Flow<List<Post>>) {
+    val data = flow.collectAsState(initial = emptyList())
+
+    val currentScreen = remember { mutableStateOf("list") }
+
+    if (currentScreen.value == "list") {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    actions = {
+                        IconButton(onClick = { }) {
+                            Icon(Icons.Filled.Settings)
+                        }
+                    }
+                )
+            },
+            bodyContent = {
+                PostsList(data = data.value) {
+                    currentScreen.value = "viewone"
+                }
+            }
+        )
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    navigationIcon = {
+                        IconButton(onClick = { currentScreen.value = "list" }) {
+                            Icon(Icons.Filled.ArrowBack)
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { }) {
+                            Icon(Icons.Filled.Settings)
+                        }
+                    }
+                )
+            },
+            bodyContent = {
+                ViewOne()
+            }
+        )
+    }
+}
 
 @ExperimentalAnimationApi
 @ExperimentalLayout

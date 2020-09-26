@@ -10,11 +10,13 @@ java {
 }
 
 dependencies {
+    // ktor
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
     implementation "io.ktor:ktor-client-okhttp:$ktor_version"
-//    implementation "io.ktor:ktor-client-json:${ktor_version}"
     implementation "io.ktor:ktor-client-serialization:${ktor_version}"
     implementation "io.ktor:ktor-client-logging:${ktor_version}"
+    implementation "io.ktor:ktor-client-encoding:${ktor_version}"
+
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
 
     testImplementation "junit:junit:$junit_version"
