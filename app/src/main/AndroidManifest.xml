@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.YetAnotherHNApp">
+        android:theme="@style/Theme.YetAnotherHNApp"
+        android:name=".YahnApplication">
         <activity
             android:name="com.github.jeremyrempel.yanhnapp.MainActivity"
             android:label="@string/app_name"

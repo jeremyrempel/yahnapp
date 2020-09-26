@@ -11,7 +11,8 @@ import kotlinx.serialization.json.Json
 
 class HackerNewsApi(
     private val scheme: String = "https",
-    private val host: String = "hacker-news.firebaseio.com"
+    private val host: String = "hacker-news.firebaseio.com",
+    private val networkDebug: (String) -> Unit
 ) {
     private val client = HttpClient {
         install(JsonFeature) {
@@ -21,8 +22,7 @@ class HackerNewsApi(
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
-                    // todo implement logging
-                    println("Network: $message")
+                    networkDebug("Network: $message")
                 }
             }
 
@@ -35,6 +35,14 @@ class HackerNewsApi(
             scheme = scheme,
             host = host,
             path = "/v0/item/${id}.json"
+        )
+    }
+
+    suspend fun fetchTopItems(): List<Int> {
+        return client.get(
+            scheme = scheme,
+            host = host,
+            path = "/v0/topstories.json"
         )
     }
 }
