@@ -34,7 +34,7 @@ class HackerNewsApi(
         return client.get(
             scheme = scheme,
             host = host,
-            path = "/v0/item/${id}.json"
+            path = "/v0/item/$id.json"
         )
     }
 
