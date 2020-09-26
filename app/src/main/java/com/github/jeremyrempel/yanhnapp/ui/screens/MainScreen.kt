@@ -21,6 +21,12 @@ import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+
+sealed class Screen {
+    object List : Screen()
+    data class ViewOne(val post: Post) : Screen()
+}
 
 @ExperimentalAnimationApi
 @ExperimentalLayout
@@ -28,9 +34,9 @@ import kotlinx.coroutines.flow.Flow
 fun MainScreen(flow: Flow<List<Post>>) {
     val data = flow.collectAsState(initial = emptyList())
 
-    val currentScreen = remember { mutableStateOf("list") }
+    val currentScreen = remember { mutableStateOf<Screen>(Screen.List) }
 
-    if (currentScreen.value == "list") {
+    if (currentScreen.value == Screen.List) {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -43,8 +49,8 @@ fun MainScreen(flow: Flow<List<Post>>) {
                 )
             },
             bodyContent = {
-                PostsList(data = data.value) {
-                    currentScreen.value = "viewone"
+                PostsList(data = data.value) { post ->
+                    currentScreen.value = Screen.ViewOne(post)
                 }
             }
         )
@@ -54,7 +60,7 @@ fun MainScreen(flow: Flow<List<Post>>) {
                 TopAppBar(
                     title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
                     navigationIcon = {
-                        IconButton(onClick = { currentScreen.value = "list" }) {
+                        IconButton(onClick = { currentScreen.value = Screen.List }) {
                             Icon(Icons.Filled.ArrowBack)
                         }
                     },
@@ -66,7 +72,8 @@ fun MainScreen(flow: Flow<List<Post>>) {
                 )
             },
             bodyContent = {
-                ViewOne()
+                val screen = currentScreen.value as Screen.ViewOne
+                ViewOne(screen.post)
             }
         )
     }
@@ -74,68 +81,20 @@ fun MainScreen(flow: Flow<List<Post>>) {
 
 @ExperimentalAnimationApi
 @ExperimentalLayout
-@Composable
-fun MainScreen(data: List<Post>) {
-    val currentScreen = remember { mutableStateOf("list") }
-
-    if (currentScreen.value == "list") {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                    actions = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Filled.Settings)
-                        }
-                    }
-                )
-            },
-            bodyContent = {
-                PostsList(data = data) {
-                    currentScreen.value = "viewone"
-                }
-            }
-        )
-    } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentScreen.value = "list" }) {
-                            Icon(Icons.Filled.ArrowBack)
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Filled.Settings)
-                        }
-                    }
-                )
-            },
-            bodyContent = {
-                ViewOne()
-            }
-        )
-    }
-}
-
-@ExperimentalAnimationApi
-@ExperimentalLayout
-@Preview(showBackground = true, showDecoration = true)
+@Preview(showBackground = true)
 @Composable
 fun MainListPreview() {
     YetAnotherHNAppTheme(false) {
-        MainScreen(data = getSample())
+        MainScreen(flowOf(getSample()))
     }
 }
 
 @ExperimentalAnimationApi
 @ExperimentalLayout
-@Preview(showBackground = true, showDecoration = true)
+@Preview(showBackground = true)
 @Composable
 fun MainListDarkPreview() {
     YetAnotherHNAppTheme(true) {
-        MainScreen(data = getSample())
+        MainScreen(flowOf(getSample()))
     }
 }

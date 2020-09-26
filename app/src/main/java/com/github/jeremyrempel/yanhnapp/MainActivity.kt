@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                         Post(
                             i + 1,
                             item.title ?: "",
+                            if (item.url != null) URL(item.url).toURI().authority else "",
                             item.url ?: "",
                             item.score ?: 0,
                             1,
