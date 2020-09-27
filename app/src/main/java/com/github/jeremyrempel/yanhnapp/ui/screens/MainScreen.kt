@@ -1,5 +1,8 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import android.content.Context
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -54,63 +57,77 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
         )
     }
 
-    when (currentScreen.value) {
-        is Screen.ViewComments -> {
-            val s = currentScreen.value as Screen.ViewComments
-        }
-        Screen.List -> {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
-                    )
-                },
-                bodyContent = {
-                    when (data.value) {
-                        is Lce.Content -> {
-                            val contentLce = data.value as Lce.Content<List<Post>>
-                            PostsList(
-                                data = contentLce.data,
-                                onSelectPost = { currentScreen.value = Screen.ViewOne(it) },
-                                onSelectPostComment = {
-                                    currentScreen.value = Screen.ViewComments(it)
-                                }
-                            )
-                        }
-                        is Lce.Loading -> {
-                            Loading()
-                        }
-                        is Lce.Error<*> -> {
-                            val err = data.value as Lce.Error<List<Post>>
-                            Text(err.error.message ?: "Error")
-                        }
+    AnimatedVisibility(
+        visible = currentScreen.value is Screen.List,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
+                )
+            },
+            bodyContent = {
+                when (data.value) {
+                    is Lce.Content -> {
+                        val contentLce = data.value as Lce.Content<List<Post>>
+                        val context = ContextAmbient.current
+
+                        PostsList(
+                            data = contentLce.data,
+                            onSelectPost = { post ->
+                                // currentScreen.value = Screen.ViewOne(it)
+
+                                // todo handle the ASKHN, no URL
+
+                                launchBrowser(post.url ?: "", context)
+                            },
+                            onSelectPostComment = {
+                                currentScreen.value = Screen.ViewComments(it)
+                            }
+                        )
+                    }
+                    is Lce.Loading -> {
+                        Loading()
+                    }
+                    is Lce.Error<*> -> {
+                        val err = data.value as Lce.Error<List<Post>>
+                        Text(err.error.message ?: "Error")
                     }
                 }
-            )
-        }
-        is Screen.ViewOne -> {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                        navigationIcon = {
-                            IconButton(onClick = { currentScreen.value = Screen.List }) {
-                                Icon(Icons.Filled.ArrowBack)
-                            }
-                        },
-                    )
-                },
-                bodyContent = {
-                    val screen = currentScreen.value as Screen.ViewOne
-                    ViewOne(screen.post)
-                }
-            )
-
-            BackButtonHandler {
-                currentScreen.value = Screen.List
             }
+        )
+    }
+
+    if (currentScreen.value is Screen.ViewOne) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    navigationIcon = {
+                        IconButton(onClick = { currentScreen.value = Screen.List }) {
+                            Icon(Icons.Filled.ArrowBack)
+                        }
+                    },
+                )
+            },
+            bodyContent = {
+                val screen = currentScreen.value as Screen.ViewOne
+                ViewOne(screen.post)
+            }
+        )
+
+        BackButtonHandler {
+            currentScreen.value = Screen.List
         }
     }
+}
+
+fun launchBrowser(url: String, context: Context) {
+
+    CustomTabsIntent.Builder().build()
+        .launchUrl(context, Uri.parse(url))
 }
 
 @ExperimentalAnimationApi
