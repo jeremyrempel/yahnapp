@@ -13,7 +13,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -25,6 +24,7 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
@@ -78,11 +78,6 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                             Icon(Icons.Filled.ArrowBack)
                         }
                     },
-                    actions = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Filled.Settings)
-                        }
-                    }
                 )
             },
             bodyContent = {
@@ -90,6 +85,10 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                 ViewOne(screen.post)
             }
         )
+
+        BackButtonHandler {
+            currentScreen.value = Screen.List
+        }
     }
 }
 
