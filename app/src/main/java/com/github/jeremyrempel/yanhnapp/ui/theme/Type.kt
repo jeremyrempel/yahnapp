@@ -15,9 +15,14 @@ val typography = Typography(
         fontSize = 16.sp
     ),
 
+    body2 = TextStyle(
+        fontSize = 14.sp,
+        color = Color.Gray
+    ),
+
     subtitle1 = TextStyle(
         color = Color.Gray
-    )
+    ),
 
     /* Other default text styles to override
 button = TextStyle(

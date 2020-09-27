@@ -1,21 +1,27 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.models.getSample
+import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 @Composable
 fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
@@ -29,37 +35,62 @@ fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
 
 @Composable
 fun PostRow(post: Post, callback: (Post) -> Unit) {
-    Row(
-        modifier = Modifier.clickable(onClick = { callback(post) })
-    ) {
-        Text(
-            text = String.format("%d.", post.rank), style = MaterialTheme.typography.h6
 
-        )
-        Column(modifier = Modifier.padding(horizontal = 5.dp)) {
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.h6
-            )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.clickable(onClick = { callback(post) })
+        ) {
 
-            Row {
+            Column(
+                modifier = Modifier.weight(0.9f).fillMaxWidth().padding(end = 10.dp)
+            ) {
                 Text(
-                    text = String.format(
-                        "%s | %d points %d hours ago | %d comments",
-                        post.domain, post.points, post.ageHours, post.commentsCnt
-                    ),
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.body1
+                    text = post.title,
+                    style = MaterialTheme.typography.h6
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    if (post.domain != null) {
+                        Text(
+                            text = post.domain,
+                            style = MaterialTheme.typography.body2
+                        )
+                    }
+
+                    Text(
+                        text = "${post.ageHours} hours ago",
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.preferredHeight(8.dp))
+            Column(
+                modifier = Modifier.weight(0.1f).align(Alignment.CenterVertically)
+            ) {
+                Image(
+                    asset = vectorResource(id = R.drawable.ic_baseline_comment_24),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text = post.commentsCnt.toString(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
         }
+
+        Divider(modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 15.dp))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PostsRowPreview() {
-    PostsList(data = getSample(), callback = {})
+    YetAnotherHNAppTheme(darkTheme = false) {
+        PostsList(data = getSample(), callback = {})
+    }
 }

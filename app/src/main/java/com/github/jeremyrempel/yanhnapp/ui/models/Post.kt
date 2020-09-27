@@ -6,8 +6,9 @@ import androidx.compose.runtime.Immutable
 data class Post(
     val rank: Int,
     val title: String,
-    val domain: String,
-    val url: String,
+    val domain: String?, // ask hn have no urls
+    val url: String?,
+    val text: String?,
     val points: Int,
     val ageHours: Int,
     val commentsCnt: Int
@@ -19,6 +20,7 @@ fun getSample() = listOf(
         "Jetpack Compose 1.0 released",
         "developer.android.com",
         "https://developer.android.com",
+        null,
         96,
         2,
         9
@@ -28,6 +30,7 @@ fun getSample() = listOf(
         "First Man on Mars. This is a super long title that should go over the maximum line length.",
         "nasa.gov",
         "https://nasa.gov",
+        null,
         1000,
         5,
         1000
@@ -37,6 +40,7 @@ fun getSample() = listOf(
         "KMM 1.0.0 released",
         "kotlinlang.org",
         "https://kotlinlang.org",
+        null,
         100,
         1,
         50
@@ -46,6 +50,7 @@ fun getSample() = listOf(
         "Jetpack Compose is Awesome",
         "medium.com",
         "https://medium.com",
+        null,
         50,
         1,
         50
@@ -55,8 +60,19 @@ fun getSample() = listOf(
         "Linus Torvalids announces presidential candidacy",
         "cnn.com",
         "https://cnn.com",
+        null,
         125,
         10,
         100
     ),
+    Post(
+        6,
+        "Ask HN: How can I learn to code?",
+        null,
+        null,
+        "<p>How can I learn to code. This is a long description with html</p>",
+        200,
+        5,
+        25
+    )
 )

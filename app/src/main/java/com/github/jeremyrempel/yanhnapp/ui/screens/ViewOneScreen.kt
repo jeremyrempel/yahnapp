@@ -46,7 +46,7 @@ fun ViewOne(post: Post) {
         }
 
         if (selectedTab.value == TAB_CONTENT) {
-            ViewOneContent(post.url)
+            ViewOneContent(post.url, post.text)
         } else {
             ViewOneComments()
         }
@@ -54,11 +54,17 @@ fun ViewOne(post: Post) {
 }
 
 @Composable
-fun ViewOneContent(url: String) {
+fun ViewOneContent(url: String?, text: String?) {
     val ctx = remember { WebContext() }
     val client = remember { WebViewClient() }
 
-    WebComponent(url = url, webViewClient = client, webContext = ctx)
+    if (text != null) {
+        Text(text = text)
+    }
+
+    if (url != null) {
+        WebComponent(url = url, webViewClient = client, webContext = ctx)
+    }
 }
 
 @ExperimentalAnimationApi

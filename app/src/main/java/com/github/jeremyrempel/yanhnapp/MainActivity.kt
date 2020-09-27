@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         val dataFlow = flow {
             try {
                 val topList = api.fetchTopItems()
-                    .take(100)
+                    .take(20)
                     .map {
                         scope.async(Dispatchers.IO) {
                             api.fetchItem(it)
@@ -46,8 +46,9 @@ class MainActivity : AppCompatActivity() {
                         Post(
                             i + 1,
                             item.title ?: "",
-                            if (item.url != null) URL(item.url).toURI().authority else "",
-                            item.url ?: "",
+                            if (item.url != null) URL(item.url).toURI().authority else null,
+                            item.url,
+                            text = item.text,
                             item.score ?: 0,
                             1,
                             item.descendants ?: 0
