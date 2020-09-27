@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.lifecycleScope
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
@@ -62,10 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             YetAnotherHNAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    MainScreen(flow = dataFlow)
-                }
+                MainScreen(flow = dataFlow)
             }
         }
     }

@@ -63,7 +63,8 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                         Loading()
                     }
                     is Lce.Error -> {
-                        Text("Error")
+                        val err = currentScreen.value as Lce.Error<List<Post>>
+                        Text(err.error.message ?: "Error")
                     }
                 }
             }
