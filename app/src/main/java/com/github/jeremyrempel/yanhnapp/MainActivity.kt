@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.screens.MainScreen
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
@@ -33,9 +34,11 @@ class MainActivity : AppCompatActivity() {
         val scope = CoroutineScope(job)
 
         val dataFlow = flow {
+            emit(Lce.Loading())
+
             try {
                 val topList = api.fetchTopItems()
-                    .take(20)
+                    .take(50)
                     .map {
                         scope.async(Dispatchers.IO) {
                             api.fetchItem(it)
@@ -55,9 +58,9 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-                emit(topList)
+                emit(Lce.Content(topList))
             } catch (e: Exception) {
-                // todo show user an err
+                emit(Lce.Error(e))
                 Timber.w(e)
             }
         }
