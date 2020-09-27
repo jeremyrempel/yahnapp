@@ -10,7 +10,7 @@ data class Post(
     val url: String?,
     val text: String?,
     val points: Int,
-    val ageHours: Int,
+    val unixTimeMs: Long,
     val commentsCnt: Int
 )
 

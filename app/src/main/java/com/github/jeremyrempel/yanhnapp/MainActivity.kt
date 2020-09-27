@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                             item.url,
                             text = item.text,
                             item.score ?: 0,
-                            1,
+                            item.time * 1000, // seconds to ms
                             item.descendants ?: 0
                         )
                     }

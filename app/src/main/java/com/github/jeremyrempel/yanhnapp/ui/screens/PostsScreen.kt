@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import android.text.format.DateUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
@@ -22,6 +23,7 @@ import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import java.util.Date
 
 @Composable
 fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
@@ -63,8 +65,11 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
                         )
                     }
 
+                    val relativeDate =
+                        DateUtils.getRelativeTimeSpanString(post.unixTimeMs, Date().time, 0)
+                            .toString()
                     Text(
-                        text = "${post.ageHours} hours ago",
+                        text = relativeDate,
                         style = MaterialTheme.typography.body2,
                     )
                 }
