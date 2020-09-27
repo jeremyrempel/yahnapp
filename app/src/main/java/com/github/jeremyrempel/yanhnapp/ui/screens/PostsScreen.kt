@@ -37,12 +37,14 @@ fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
 fun PostRow(post: Post, callback: (Post) -> Unit) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.clickable(onClick = { callback(post) })
-        ) {
+        Row {
 
             Column(
-                modifier = Modifier.weight(0.9f).fillMaxWidth().padding(end = 10.dp)
+                modifier = Modifier
+                    .weight(0.9f)
+                    .fillMaxWidth()
+                    .padding(end = 10.dp)
+                    .clickable(onClick = { callback(post) }),
             ) {
                 Text(
                     text = post.title,
