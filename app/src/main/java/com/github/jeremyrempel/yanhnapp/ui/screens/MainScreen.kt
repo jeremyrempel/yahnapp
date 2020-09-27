@@ -40,12 +40,7 @@ fun MainScreen(flow: Flow<List<Post>>) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                    actions = {
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Filled.Settings)
-                        }
-                    }
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
                 )
             },
             bodyContent = {
