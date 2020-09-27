@@ -7,22 +7,19 @@ import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.setContent
+import androidx.lifecycle.lifecycleScope
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.screens.MainScreen
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import java.net.URL
 
 class MainActivity : AppCompatActivity() {
-
-    val job = Job()
 
     @ExperimentalAnimationApi
     @ExperimentalLayout
@@ -31,8 +28,6 @@ class MainActivity : AppCompatActivity() {
 
         val api = HackerNewsApi(networkDebug = Timber::d)
 
-        val scope = CoroutineScope(job)
-
         val dataFlow = flow {
             emit(Lce.Loading())
 
@@ -40,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                 val topList = api.fetchTopItems()
                     .take(50)
                     .map {
-                        scope.async(Dispatchers.IO) {
+                        lifecycleScope.async(Dispatchers.IO) {
                             api.fetchItem(it)
                         }
                     }.map {
@@ -73,10 +68,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
     }
 }
