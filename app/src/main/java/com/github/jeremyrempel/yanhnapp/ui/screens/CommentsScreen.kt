@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -25,8 +26,13 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TextButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,14 +41,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
+import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.models.Comment
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 const val animationTime = 300
+
+@ExperimentalAnimationApi
+@ExperimentalLayout
+@Composable
+fun CommentsScreen(comments: List<Comment>, goUp: () -> Unit) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                navigationIcon = {
+                    IconButton(onClick = { goUp() }) {
+                        Icon(Icons.Filled.ArrowBack)
+                    }
+                },
+            )
+        },
+        bodyContent = {
+            CommentList(comments = comments)
+        }
+    )
+
+    BackButtonHandler {
+        goUp()
+    }
+}
+
+@ExperimentalAnimationApi
+@ExperimentalLayout
+@Composable
+fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
+    LazyColumnFor(items = comments, modifier = modifier) { comment ->
+        CommentTree(level = 0, comment = comment, modifier = modifier)
+    }
+}
 
 @Composable
 fun SingleComment(comment: Comment, modifier: Modifier) {
@@ -97,15 +140,6 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
                 )
             }
         }
-    }
-}
-
-@ExperimentalAnimationApi
-@ExperimentalLayout
-@Composable
-fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
-    LazyColumnFor(items = comments, modifier = modifier) { comment ->
-        CommentTree(level = 0, comment = comment, modifier = modifier)
     }
 }
 
@@ -176,40 +210,6 @@ fun CommentLevelDivider(level: Int, modifier: Modifier) {
 @Composable
 fun CommentPreview() {
     YetAnotherHNAppTheme {
-        CommentList(
-            comments = listOf(
-                Comment(
-                    "En",
-                    6,
-                    "L1: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                    listOf(
-                        Comment(
-                            "Kaiman",
-                            6,
-                            "L2: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                            listOf(
-                                Comment(
-                                    "Nikaido",
-                                    4,
-                                    "L3: I'm a short one liner reply",
-                                    listOf(
-                                        Comment(
-                                            "Shen",
-                                            10,
-                                            "L3: Nikaido. Are you a sorceror?"
-                                        )
-                                    )
-                                ),
-                                Comment(
-                                    "Ebisu",
-                                    1,
-                                    "L3: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                                )
-                            )
-                        ),
-                    )
-                ),
-            )
-        )
+        CommentList(comments = SampleData.commentList)
     }
 }

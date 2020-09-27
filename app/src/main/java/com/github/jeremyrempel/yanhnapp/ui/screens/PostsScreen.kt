@@ -20,23 +20,23 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
-import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import java.util.Date
 
 @Composable
-fun PostsList(data: List<Post>, callback: (post: Post) -> Unit) {
+fun PostsList(data: List<Post>, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
     LazyColumnFor(
         items = data,
         modifier = Modifier.padding(5.dp)
     ) { row ->
-        PostRow(row, callback)
+        PostRow(row, onSelectPost, onSelectPostComment)
     }
 }
 
 @Composable
-fun PostRow(post: Post, callback: (Post) -> Unit) {
+fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row {
@@ -46,7 +46,7 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
                     .weight(0.9f)
                     .fillMaxWidth()
                     .padding(end = 10.dp)
-                    .clickable(onClick = { callback(post) }),
+                    .clickable(onClick = { onSelectPost(post) }),
             ) {
                 Text(
                     text = post.title,
@@ -76,7 +76,12 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
             }
 
             Column(
-                modifier = Modifier.weight(0.1f).align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .weight(0.1f)
+                    .align(Alignment.CenterVertically)
+                    .clickable(
+                        onClick = { onSelectPostComment(post) }
+                    ),
             ) {
                 Image(
                     asset = vectorResource(id = R.drawable.ic_baseline_comment_24),
@@ -98,6 +103,6 @@ fun PostRow(post: Post, callback: (Post) -> Unit) {
 @Composable
 fun PostsRowPreview() {
     YetAnotherHNAppTheme(darkTheme = false) {
-        PostsList(data = getSample(), callback = {})
+        PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
     }
 }

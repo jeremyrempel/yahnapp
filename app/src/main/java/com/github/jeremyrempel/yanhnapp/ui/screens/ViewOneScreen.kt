@@ -16,8 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
-import com.github.jeremyrempel.yanhnapp.ui.models.getSample
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 const val TAB_CONTENT = 0
@@ -80,6 +80,6 @@ fun ViewOneComments() {
 @Composable
 fun ViewOnePreview() {
     YetAnotherHNAppTheme(false) {
-        ViewOne(getSample()[0])
+        ViewOne(SampleData.posts.first())
     }
 }
