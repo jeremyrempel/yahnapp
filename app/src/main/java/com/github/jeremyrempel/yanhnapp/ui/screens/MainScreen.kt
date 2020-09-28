@@ -77,11 +77,11 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                         PostsList(
                             data = contentLce.data,
                             onSelectPost = { post ->
-                                // currentScreen.value = Screen.ViewOne(it)
-
-                                // todo handle the ASKHN, no URL
-
-                                launchBrowser(post.url ?: "", context)
+                                if (post.url != null) {
+                                    launchBrowser(post.url, context)
+                                } else {
+                                    currentScreen.value = Screen.ViewOne(post)
+                                }
                             },
                             onSelectPostComment = {
                                 currentScreen.value = Screen.ViewComments(it)
@@ -100,7 +100,11 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
         )
     }
 
-    if (currentScreen.value is Screen.ViewOne) {
+    AnimatedVisibility(
+        visible = currentScreen.value is Screen.ViewOne,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -125,8 +129,11 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
 }
 
 fun launchBrowser(url: String, context: Context) {
-
-    CustomTabsIntent.Builder().build()
+    CustomTabsIntent.Builder()
+        .setShowTitle(true)
+        .setDefaultShareMenuItemEnabled(true)
+        .setUrlBarHidingEnabled(true)
+        .build()
         .launchUrl(context, Uri.parse(url))
 }
 
