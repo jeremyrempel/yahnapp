@@ -1,14 +1,14 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -20,7 +20,6 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
-import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
@@ -40,60 +39,47 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
     val data = flow.collectAsState(initial = Lce.Loading())
     val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
 
-    AnimatedVisibility(
-        visible = currentScreen.value is Screen.ViewComments,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        CommentsScreen(
-            comments = SampleData.commentList,
-            goUp = { currentScreen.value = Screen.List() }
-        )
-    }
-
-    AnimatedVisibility(
-        visible = currentScreen.value is Screen.List,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
+    // todo combine the scaffolds and animate the topbar
+    Crossfade(currentScreen.value) { screen ->
+        when (screen) {
+            is Screen.ViewComments -> {
+                CommentsScreen(
+                    comments = SampleData.commentList,
+                    goUp = { currentScreen.value = Screen.List() }
                 )
-            },
-            bodyContent = {
-                ListContent(data.value) { newScreen ->
-                    currentScreen.value = newScreen
-                }
             }
-        )
-    }
-
-    AnimatedVisibility(
-        visible = currentScreen.value is Screen.ViewOne,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                    navigationIcon = {
-                        IconButton(onClick = { currentScreen.value = Screen.List() }) {
-                            Icon(Icons.Filled.ArrowBack)
-                        }
+            is Screen.List -> {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
+                        )
                     },
+                    bodyContent = {
+                        ListContent(data.value) { newScreen ->
+                            currentScreen.value = newScreen
+                        }
+                    }
                 )
-            },
-            bodyContent = {
-                val screen = currentScreen.value as Screen.ViewOne
-                ViewOne(screen.post)
             }
-        )
-
-        BackButtonHandler {
-            currentScreen.value = Screen.List()
+            is Screen.ViewOne -> {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                            navigationIcon = {
+                                IconButton(onClick = { currentScreen.value = Screen.List() }) {
+                                    Icon(Icons.Filled.ArrowBack)
+                                }
+                            },
+                        )
+                    },
+                    bodyContent = {
+                        val s = currentScreen.value as Screen.ViewOne
+                        ViewOne(s.post)
+                    }
+                )
+            }
         }
     }
 }
