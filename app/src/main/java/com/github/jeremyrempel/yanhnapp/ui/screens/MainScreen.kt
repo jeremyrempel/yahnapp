@@ -1,8 +1,5 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
-import android.content.Context
-import android.net.Uri
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -16,7 +13,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,14 +22,13 @@ import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
-import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 sealed class Screen {
-    object List : Screen()
+    data class List(val isLoading: Boolean = false) : Screen()
     data class ViewOne(val post: Post) : Screen()
     data class ViewComments(val post: Post) : Screen()
 }
@@ -42,9 +37,8 @@ sealed class Screen {
 @ExperimentalLayout
 @Composable
 fun MainScreen(flow: Flow<Lce<List<Post>>>) {
-    val data: State<Lce<List<Post>>> = flow.collectAsState(initial = Lce.Loading())
-
-    val currentScreen = remember { mutableStateOf<Screen>(Screen.List) }
+    val data = flow.collectAsState(initial = Lce.Loading())
+    val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
 
     AnimatedVisibility(
         visible = currentScreen.value is Screen.ViewComments,
@@ -53,7 +47,7 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
     ) {
         CommentsScreen(
             comments = SampleData.commentList,
-            goUp = { currentScreen.value = Screen.List }
+            goUp = { currentScreen.value = Screen.List() }
         )
     }
 
@@ -69,32 +63,8 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                 )
             },
             bodyContent = {
-                when (data.value) {
-                    is Lce.Content -> {
-                        val contentLce = data.value as Lce.Content<List<Post>>
-                        val context = ContextAmbient.current
-
-                        PostsList(
-                            data = contentLce.data,
-                            onSelectPost = { post ->
-                                if (post.url != null) {
-                                    launchBrowser(post.url, context)
-                                } else {
-                                    currentScreen.value = Screen.ViewOne(post)
-                                }
-                            },
-                            onSelectPostComment = {
-                                currentScreen.value = Screen.ViewComments(it)
-                            }
-                        )
-                    }
-                    is Lce.Loading -> {
-                        Loading()
-                    }
-                    is Lce.Error<*> -> {
-                        val err = data.value as Lce.Error<List<Post>>
-                        Text(err.error.message ?: "Error")
-                    }
+                ListContent(data.value) { newScreen ->
+                    currentScreen.value = newScreen
                 }
             }
         )
@@ -110,7 +80,7 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
                 TopAppBar(
                     title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
                     navigationIcon = {
-                        IconButton(onClick = { currentScreen.value = Screen.List }) {
+                        IconButton(onClick = { currentScreen.value = Screen.List() }) {
                             Icon(Icons.Filled.ArrowBack)
                         }
                     },
@@ -123,18 +93,9 @@ fun MainScreen(flow: Flow<Lce<List<Post>>>) {
         )
 
         BackButtonHandler {
-            currentScreen.value = Screen.List
+            currentScreen.value = Screen.List()
         }
     }
-}
-
-fun launchBrowser(url: String, context: Context) {
-    CustomTabsIntent.Builder()
-        .setShowTitle(true)
-        .setDefaultShareMenuItemEnabled(true)
-        .setUrlBarHidingEnabled(true)
-        .build()
-        .launchUrl(context, Uri.parse(url))
 }
 
 @ExperimentalAnimationApi

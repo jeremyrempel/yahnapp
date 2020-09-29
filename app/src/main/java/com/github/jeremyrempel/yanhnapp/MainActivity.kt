@@ -19,8 +19,8 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
-    @ExperimentalAnimationApi
     @ExperimentalLayout
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
