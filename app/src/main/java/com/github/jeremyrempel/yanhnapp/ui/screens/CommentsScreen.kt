@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animate
@@ -10,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -26,14 +26,10 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.TextButton
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,40 +37,71 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
-import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
+import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.models.Comment
+import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import org.apache.commons.text.StringEscapeUtils
+import timber.log.Timber
+import java.util.Date
 
 const val animationTime = 300
+
+suspend fun CoroutineScope.getCommentsForPost(postId: Int, api: HackerNewsApi): List<Comment> {
+    val kids = (api.fetchItem(postId).kids ?: emptyList()).take(20)
+    return kids.map {
+        async(Dispatchers.IO) {
+            api.fetchItem(it)
+        }
+    }
+        .map { it.await() }
+        .filter { !it.deleted }
+        .map { item ->
+            Comment(
+                item.by ?: "",
+                item.time * 1000,
+                item.text ?: "",
+                emptyList()
+            )
+        }
+}
 
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun CommentsScreen(comments: List<Comment>, goUp: () -> Unit) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                navigationIcon = {
-                    IconButton(onClick = { goUp() }) {
-                        Icon(Icons.Filled.ArrowBack)
-                    }
-                },
-            )
-        },
-        bodyContent = {
-            CommentList(comments = comments)
-        }
-    )
+fun CommentsScreen(api: HackerNewsApi, post: Post) {
 
-    BackButtonHandler {
-        goUp()
+    val result = remember(post.id) { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
+
+    launchInComposition {
+        try {
+            result.value = Lce.Content(getCommentsForPost(post.id, api))
+        } catch (e: Exception) {
+            Timber.e(e)
+            result.value = Lce.Error(e)
+        }
+    }
+
+    when (result.value) {
+        is Lce.Loading -> Loading()
+        is Lce.Error -> {
+            val errorMsg = (result.value as Lce.Error).error.message ?: "Unknown Error"
+            Text(errorMsg)
+        }
+        is Lce.Content -> {
+            val contentResult = result.value as Lce.Content
+            CommentList(comments = contentResult.data)
+        }
     }
 }
 
@@ -89,8 +116,21 @@ fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
 
 @Composable
 fun SingleComment(comment: Comment, modifier: Modifier) {
+
+    val contentEscape = remember(comment.content) {
+        StringEscapeUtils.unescapeHtml4(comment.content)
+            .replace("<p>", "\n")
+            .replace("</p>", "")
+    }
+
+    val timeRelative = remember(comment.unixTimeMs) {
+        DateUtils
+            .getRelativeTimeSpanString(comment.unixTimeMs, Date().time, 0)
+            .toString()
+    }
+
     Column(
-        modifier = modifier.padding(start = 5.dp, end = 5.dp).fillMaxWidth()
+        modifier = modifier.padding(top = 10.dp, end = 10.dp).fillMaxWidth()
     ) {
         Row {
             Text(
@@ -99,14 +139,16 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
                 modifier = modifier.padding(end = 10.dp)
             )
             Text(
-                text = "${comment.ageHours} hours ago", // todo make string resource
+                text = timeRelative,
                 style = MaterialTheme.typography.subtitle1
             )
         }
         Text(
-            text = comment.content,
+            text = contentEscape,
             style = MaterialTheme.typography.body1
         )
+
+        Divider(modifier = Modifier.fillMaxWidth().padding(top = 10.dp))
     }
 }
 

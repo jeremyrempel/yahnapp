@@ -16,6 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionCoroutineScope
+import androidx.compose.runtime.launchInComposition
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -23,24 +27,72 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import timber.log.Timber
+import java.lang.Exception
+import java.net.URL
 import java.util.Date
+
+private suspend fun CompositionCoroutineScope.fetchData(api: HackerNewsApi): List<Post> {
+    return api.fetchTopItems()
+        .take(50)
+        .map {
+            async(Dispatchers.IO) {
+                api.fetchItem(it)
+            }
+        }.map {
+            it.await()
+        }.mapIndexed { i, item ->
+            Post(
+                item.id,
+                item.title ?: "",
+                if (item.url != null) URL(item.url).toURI().authority else null,
+                item.url,
+                text = item.text,
+                item.score ?: 0,
+                item.time * 1000, // seconds to ms
+                item.descendants ?: 0
+            )
+        }
+}
 
 @Composable
 fun ListContent(
-    lce: Lce<List<Post>>,
+    api: HackerNewsApi,
     navigateTo: (Screen) -> Unit
 ) {
-    when (lce) {
-        is Lce.Content -> {
+    val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
+
+    launchInComposition {
+        try {
+            val topList = fetchData(api)
+            result.value = Lce.Content(topList)
+        } catch (e: Exception) {
+            Timber.e(e)
+            result.value = Lce.Error(e)
+        }
+    }
+
+    when (result.value) {
+        is Lce.Loading -> Loading()
+        is Lce.Error -> {
+            val errorMsg = (result.value as Lce.Error).error.message ?: "Unknown Error"
+            Text(errorMsg)
+        }
+        else -> {
             val context = ContextAmbient.current
+            val data = (result.value as Lce.Content).data
+
             PostsList(
-                data = lce.data,
+                data = data,
                 onSelectPost = { post ->
                     if (post.url != null) {
                         launchBrowser(post.url, context)
@@ -52,13 +104,6 @@ fun ListContent(
                     navigateTo(Screen.ViewComments(post))
                 }
             )
-        }
-        is Lce.Loading -> {
-            Loading()
-        }
-        is Lce.Error<*> -> {
-            val err = lce as Lce.Error<List<Post>>
-            Text(err.error.message ?: "Error")
         }
     }
 }

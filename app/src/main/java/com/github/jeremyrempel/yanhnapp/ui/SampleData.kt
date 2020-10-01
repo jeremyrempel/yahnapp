@@ -16,7 +16,7 @@ object SampleData {
             9
         ),
         Post(
-            2,
+            1,
             "First Man on Mars. This is a super long title that should go over the maximum line length.",
             "nasa.gov",
             "https://nasa.gov",
@@ -26,7 +26,7 @@ object SampleData {
             1000
         ),
         Post(
-            3,
+            1,
             "KMM 1.0.0 released",
             "kotlinlang.org",
             "https://kotlinlang.org",
@@ -36,7 +36,7 @@ object SampleData {
             50
         ),
         Post(
-            4,
+            1,
             "Jetpack Compose is Awesome",
             "medium.com",
             "https://medium.com",
@@ -46,7 +46,7 @@ object SampleData {
             50
         ),
         Post(
-            5,
+            1,
             "Linus Torvalids announces presidential candidacy",
             "cnn.com",
             "https://cnn.com",
@@ -56,7 +56,7 @@ object SampleData {
             100
         ),
         Post(
-            6,
+            1,
             "Ask HN: How can I learn to code?",
             null,
             null,
@@ -71,7 +71,7 @@ object SampleData {
         Comment(
             "En",
             6,
-            "L1: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+            "&#34;Lorem Ipsum&&#34;<p> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
             listOf(
                 Comment(
                     "Kaiman",
