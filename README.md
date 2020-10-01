@@ -4,7 +4,12 @@ Yet another Hacker News App is an Android app built using [Jetpack Compose](http
 
 ## Why
 
-- Why build another Hacker News app, isn't there already several [available](https://play.google.com/store/apps/collection/cluster?clp=ggENCgtoYWNrZXIgbmV3cw%3D%3D:S:ANO1ljLdfVU&gsr=ChCCAQ0KC2hhY2tlciBuZXdz:S:ANO1ljK0-98) in Play Store? Yes there is but now there is one more. Its primary purpose is an excuse to experiment and learn with new Android based technologies
+Why build another Hacker News app, isn't there already several [available](https://play.google.com/store/apps/collection/cluster?clp=ggENCgtoYWNrZXIgbmV3cw%3D%3D:S:ANO1ljLdfVU&gsr=ChCCAQ0KC2hhY2tlciBuZXdz:S:ANO1ljK0-98) in Play Store?
+
+* Modern Android app [targeting](https://github.com/jeremyrempel/yahnapp/blob/603d94abd96727bc1086cb4bed6403b59057fb52/app/build.gradle#L12) the latest version of Android
+* Utilizes modern Android libraries and frameworks including:
+  * [Jetpack Compose](https://developer.android.com/jetpack/compose)
+  * [Kotlin coroutines](https://developer.android.com/kotlin/coroutines)
 
 ## What does it look like?
 
