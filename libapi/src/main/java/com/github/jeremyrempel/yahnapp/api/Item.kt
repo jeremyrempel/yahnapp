@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Item(
     val id: Int,
     val type: ItemType,
-    val by: String,
+    val by: String? = null,
     val time: Long,
     val text: String? = null,
     val kids: List<Int>? = null,
@@ -15,6 +15,8 @@ data class Item(
     val score: Int? = null,
     val title: String? = null,
     val descendants: Int? = null,
+    val deleted: Boolean = false,
+    val dead: Boolean = false
 )
 
 enum class ItemType {
