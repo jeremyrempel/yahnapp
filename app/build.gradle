@@ -43,6 +43,7 @@ android {
         abortOnError true
         ignoreWarnings false
         warningsAsErrors true
+        disable 'GradleDependency'
     }
 }
 
