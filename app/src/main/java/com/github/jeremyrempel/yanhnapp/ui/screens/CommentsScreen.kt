@@ -3,6 +3,7 @@ package com.github.jeremyrempel.yanhnapp.ui.screens
 import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -23,7 +24,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
@@ -33,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.vectorResource
@@ -120,8 +121,10 @@ fun CommentsScreen(api: HackerNewsApi, post: Post) {
 @ExperimentalLayout
 @Composable
 fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
-    LazyColumnFor(items = comments, modifier = modifier) { comment ->
-        CommentTree(level = 0, comment = comment, modifier = modifier)
+    Column {
+        comments.forEach { comment ->
+            CommentTree(level = 0, comment = comment, modifier = modifier)
+        }
     }
 }
 
@@ -187,12 +190,12 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
                     asset = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
                     colorFilter = ColorFilter.tint(Color.Gray),
                     // app crashes on alternate
-                    // modifier = modifier.drawLayer(
-                    //     scaleY = animate(
-                    //         target = if (isExpanded) -1f else 1f,
-                    //         animSpec = TweenSpec(animationTime)
-                    //     )
-                    // )
+                    modifier = modifier.drawLayer(
+                        scaleY = animate(
+                            target = if (isExpanded) -1f else 1f,
+                            animSpec = TweenSpec(animationTime)
+                        )
+                    )
                 )
             }
         }
