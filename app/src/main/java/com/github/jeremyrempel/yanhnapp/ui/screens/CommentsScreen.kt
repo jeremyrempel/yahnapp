@@ -3,7 +3,6 @@ package com.github.jeremyrempel.yanhnapp.ui.screens
 import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -13,8 +12,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope.align
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -34,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.vectorResource
@@ -143,9 +141,12 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
     }
 
     Column(
-        modifier = modifier.padding(end = 10.dp).fillMaxWidth()
+        modifier = modifier.padding(end = 10.dp)
     ) {
-        Row {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(
                 text = comment.userName,
                 style = MaterialTheme.typography.subtitle1,
@@ -167,7 +168,8 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
 fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick: () -> Unit) {
 
     Row(
-        modifier = modifier.align(Alignment.End)
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
     ) {
         if (count > 0) {
             TextButton(
@@ -184,12 +186,13 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
                 Image(
                     asset = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
                     colorFilter = ColorFilter.tint(Color.Gray),
-                    modifier = modifier.drawLayer(
-                        scaleY = animate(
-                            target = if (isExpanded) -1f else 1f,
-                            animSpec = TweenSpec(animationTime)
-                        )
-                    )
+                    // app crashes on alternate
+                    // modifier = modifier.drawLayer(
+                    //     scaleY = animate(
+                    //         target = if (isExpanded) -1f else 1f,
+                    //         animSpec = TweenSpec(animationTime)
+                    //     )
+                    // )
                 )
             }
         }
