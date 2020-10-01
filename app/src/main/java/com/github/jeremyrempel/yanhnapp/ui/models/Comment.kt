@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class Comment(
     val userName: String,
-    val ageHours: Int,
+    val unixTimeMs: Long,
     val content: String,
     val children: List<Comment> = emptyList()
 )

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class Post(
-    val rank: Int,
+    val id: Int,
     val title: String,
     val domain: String?, // ask hn have no urls
     val url: String?,
