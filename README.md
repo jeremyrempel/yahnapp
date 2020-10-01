@@ -10,6 +10,8 @@ Why build another Hacker News app, isn't there already several [available](https
 * Utilizes modern Android libraries and frameworks including:
   * [Jetpack Compose](https://developer.android.com/jetpack/compose)
   * [Kotlin coroutines](https://developer.android.com/kotlin/coroutines)
+  * [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
+  * [Ktor](https://github.com/ktorio/ktor)
 
 ## What does it look like?
 
