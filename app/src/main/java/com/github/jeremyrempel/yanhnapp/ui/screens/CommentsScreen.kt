@@ -48,18 +48,18 @@ import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.models.Comment
 import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.apache.commons.text.StringEscapeUtils
 import timber.log.Timber
 import java.util.Date
 
 const val animationTime = 300
 
-suspend fun CoroutineScope.getCommentsForPost(postId: Int, api: HackerNewsApi): List<Comment> {
+suspend fun getCommentsForPost(postId: Int, api: HackerNewsApi) = coroutineScope {
     val kids = (api.fetchItem(postId).kids ?: emptyList()).take(20)
-    return kids.map {
+    kids.map {
         async(Dispatchers.IO) {
             api.fetchItem(it)
         }
