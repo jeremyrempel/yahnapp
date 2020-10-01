@@ -57,23 +57,36 @@ import java.util.Date
 
 const val animationTime = 300
 
+/**
+ * Given list of trees, fetch all leafs and metadata
+ */
 suspend fun getCommentsForPost(postId: Int, api: HackerNewsApi) = coroutineScope {
-    val kids = (api.fetchItem(postId).kids ?: emptyList()).take(20)
-    kids.map {
-        async(Dispatchers.IO) {
-            api.fetchItem(it)
-        }
+
+    // dfs
+    suspend fun getCommentsByIds(commentIds: List<Int>): List<Comment> {
+        return commentIds
+            .map {
+                async(Dispatchers.IO) {
+                    api.fetchItem(it)
+                }
+            }.map { it.await() }
+            .map { item ->
+                // recurse
+                val commentChildren = getCommentsByIds(item.kids ?: listOf())
+
+                Comment(
+                    item.by ?: "",
+                    item.time * 1000,
+                    item.text ?: "",
+                    commentChildren
+                )
+            }
     }
-        .map { it.await() }
-        .filter { !it.deleted }
-        .map { item ->
-            Comment(
-                item.by ?: "",
-                item.time * 1000,
-                item.text ?: "",
-                emptyList()
-            )
-        }
+
+    val kids = (api.fetchItem(postId).kids ?: emptyList())
+
+    // dfs start
+    getCommentsByIds(kids)
 }
 
 @ExperimentalAnimationApi
@@ -130,7 +143,7 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
     }
 
     Column(
-        modifier = modifier.padding(top = 10.dp, end = 10.dp).fillMaxWidth()
+        modifier = modifier.padding(end = 10.dp).fillMaxWidth()
     ) {
         Row {
             Text(
@@ -147,8 +160,6 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
             text = contentEscape,
             style = MaterialTheme.typography.body1
         )
-
-        Divider(modifier = Modifier.fillMaxWidth().padding(top = 10.dp))
     }
 }
 
@@ -156,11 +167,11 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
 fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick: () -> Unit) {
 
     Row(
-        modifier = modifier.align(Alignment.End).padding(end = 10.dp)
+        modifier = modifier.align(Alignment.End)
     ) {
         if (count > 0) {
             TextButton(
-                onClick = { onClick() }
+                onClick = onClick
             ) {
 
                 Text(
@@ -204,6 +215,7 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
             ) {
                 showChildren.value = !showChildren.value
             }
+            Spacer(modifier = Modifier.preferredHeight(10.dp).fillMaxWidth())
         }
     }
 
@@ -228,8 +240,10 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
             animSpec = TweenSpec(animationTime)
         )
     ) {
-        LazyColumnFor(items = comment.children, modifier = modifier) { c ->
-            CommentTree(level = level + 1, comment = c, modifier = modifier)
+        Column {
+            comment.children.forEach { c ->
+                CommentTree(level = level + 1, comment = c, modifier = modifier)
+            }
         }
     }
 }
