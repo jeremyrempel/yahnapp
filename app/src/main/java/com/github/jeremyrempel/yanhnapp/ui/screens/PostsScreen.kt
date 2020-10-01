@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionCoroutineScope
 import androidx.compose.runtime.launchInComposition
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +35,14 @@ import com.github.jeremyrempel.yanhnapp.ui.models.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import java.lang.Exception
 import java.net.URL
 import java.util.Date
 
-private suspend fun CompositionCoroutineScope.fetchData(api: HackerNewsApi): List<Post> {
-    return api.fetchTopItems()
+private suspend fun fetchData(api: HackerNewsApi) = coroutineScope {
+    api.fetchTopItems()
         .take(50)
         .map {
             async(Dispatchers.IO) {
