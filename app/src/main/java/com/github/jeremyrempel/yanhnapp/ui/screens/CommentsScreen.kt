@@ -12,6 +12,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -121,7 +122,7 @@ fun CommentsScreen(api: HackerNewsApi, post: Post) {
 @ExperimentalLayout
 @Composable
 fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
-    Column {
+    ScrollableColumn {
         comments.forEach { comment ->
             CommentTree(level = 0, comment = comment, modifier = modifier)
         }
