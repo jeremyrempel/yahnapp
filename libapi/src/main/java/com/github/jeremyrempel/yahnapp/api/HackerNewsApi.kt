@@ -34,7 +34,7 @@ class HackerNewsApi(
         }
     }
 
-    suspend fun fetchItem(id: Int): Item {
+    suspend fun fetchItem(id: Long): Item {
         return client.get(
             scheme = scheme,
             host = host,

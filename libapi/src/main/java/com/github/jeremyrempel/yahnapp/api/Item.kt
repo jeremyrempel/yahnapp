@@ -9,7 +9,7 @@ data class Item(
     val by: String? = null,
     val time: Long,
     val text: String? = null,
-    val kids: List<Int>? = null,
+    val kids: List<Long>? = null,
     val parent: Int? = null,
     val url: String? = null,
     val score: Int? = null,

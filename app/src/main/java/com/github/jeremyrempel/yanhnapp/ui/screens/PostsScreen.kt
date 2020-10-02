@@ -26,12 +26,12 @@ import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
-import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -46,20 +46,20 @@ private suspend fun fetchData(api: HackerNewsApi) = coroutineScope {
         .take(50)
         .map {
             async(Dispatchers.IO) {
-                api.fetchItem(it)
+                api.fetchItem(it.toLong())
             }
         }.map {
             it.await()
         }.mapIndexed { i, item ->
             Post(
-                item.id,
-                item.title ?: "",
-                if (item.url != null) URL(item.url).toURI().authority else null,
-                item.url,
+                id = item.id.toLong(),
+                title = item.title ?: "",
                 text = item.text,
-                item.score ?: 0,
-                item.time * 1000, // seconds to ms
-                item.descendants ?: 0
+                url = if (item.url != null) URL(item.url).toURI().authority else null,
+                domain = "",
+                points = 0,
+                unixTime = item.time * 1000, // seconds to ms
+                commentsCnt = item.descendants?.toLong() ?: 0
             )
         }
 }
@@ -118,7 +118,11 @@ fun launchBrowser(url: String, context: Context) {
 }
 
 @Composable
-fun PostsList(data: List<Post>, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
+fun PostsList(
+    data: List<Post>,
+    onSelectPost: (Post) -> Unit,
+    onSelectPostComment: (Post) -> Unit
+) {
     LazyColumnFor(
         items = data
     ) { row ->
@@ -159,7 +163,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                     }
 
                     val relativeDate =
-                        DateUtils.getRelativeTimeSpanString(post.unixTimeMs, Date().time, 0)
+                        DateUtils.getRelativeTimeSpanString(post.unixTime, Date().time, 0)
                             .toString()
                     Text(
                         text = relativeDate,

@@ -1,0 +1,17 @@
+CREATE TABLE post (
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    text TEXT,
+    domain TEXT,
+    url TEXT,
+    points INTEGER NOT NULL,
+    unixTime INTEGER NOT NULL,
+    commentsCnt INTEGER NOT NULL
+);
+
+insert:
+INSERT INTO post (id, title, text, domain, url, points, unixTime, commentsCnt)
+VALUES ?;
+
+selectPosts:
+SELECT * FROM post;

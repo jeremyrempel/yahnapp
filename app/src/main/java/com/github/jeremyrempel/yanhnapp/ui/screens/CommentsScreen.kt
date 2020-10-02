@@ -40,13 +40,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.Lce
+import com.github.jeremyrempel.yahnapp.api.model.Comment
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
-import com.github.jeremyrempel.yahnapp.api.model.Comment
-import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -60,10 +60,10 @@ const val animationTime = 300
 /**
  * Given list of trees, fetch all leafs and metadata
  */
-suspend fun getCommentsForPost(postId: Int, api: HackerNewsApi) = coroutineScope {
+suspend fun getCommentsForPost(postId: Long, api: HackerNewsApi) = coroutineScope {
 
     // dfs
-    suspend fun getCommentsByIds(commentIds: List<Int>): List<Comment> {
+    suspend fun getCommentsByIds(commentIds: List<Long>): List<Comment> {
         return commentIds
             .map {
                 async(Dispatchers.IO) {
