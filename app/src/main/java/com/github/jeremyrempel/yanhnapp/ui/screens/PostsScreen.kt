@@ -31,7 +31,7 @@ import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
-import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -95,7 +95,7 @@ fun ListContent(
                 data = data,
                 onSelectPost = { post ->
                     if (post.url != null) {
-                        launchBrowser(post.url, context)
+                        launchBrowser(post.url!!, context)
                     } else {
                         navigateTo(Screen.ViewOne(post))
                     }
@@ -153,7 +153,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
 
                     if (post.domain != null) {
                         Text(
-                            text = post.domain,
+                            text = post.domain!!,
                             style = MaterialTheme.typography.body2
                         )
                     }

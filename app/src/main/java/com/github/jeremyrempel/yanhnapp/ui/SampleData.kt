@@ -1,7 +1,7 @@
 package com.github.jeremyrempel.yanhnapp.ui
 
-import com.github.jeremyrempel.yanhnapp.ui.models.Comment
-import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yahnapp.api.model.Comment
+import com.github.jeremyrempel.yahnapp.api.model.Post
 
 object SampleData {
     val posts = listOf(

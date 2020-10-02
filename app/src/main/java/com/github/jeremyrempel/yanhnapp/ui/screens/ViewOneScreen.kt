@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
-import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 const val TAB_CONTENT = 0

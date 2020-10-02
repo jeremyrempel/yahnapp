@@ -1,8 +1,5 @@
-package com.github.jeremyrempel.yanhnapp.ui.models
+package com.github.jeremyrempel.yahnapp.api.model
 
-import androidx.compose.runtime.Immutable
-
-@Immutable
 data class Post(
     val id: Int,
     val title: String,

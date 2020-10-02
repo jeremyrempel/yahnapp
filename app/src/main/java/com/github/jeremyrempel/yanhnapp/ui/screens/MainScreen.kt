@@ -18,7 +18,7 @@ import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
-import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 sealed class Screen {

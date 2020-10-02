@@ -45,8 +45,8 @@ import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
-import com.github.jeremyrempel.yanhnapp.ui.models.Comment
-import com.github.jeremyrempel.yanhnapp.ui.models.Post
+import com.github.jeremyrempel.yahnapp.api.model.Comment
+import com.github.jeremyrempel.yahnapp.api.model.Post
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
