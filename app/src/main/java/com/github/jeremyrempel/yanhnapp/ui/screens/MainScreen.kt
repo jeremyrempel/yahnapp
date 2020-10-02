@@ -37,60 +37,64 @@ fun MainScreen(api: HackerNewsApi) {
     Crossfade(currentScreen.value) { screen ->
         when (screen) {
             is Screen.List -> {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(ContextAmbient.current.getString(R.string.app_name)) }
-                        )
-                    },
-                    bodyContent = {
+                ScaffoldWithContent(
+                    content = {
                         ListContent(api) { newScreen ->
                             currentScreen.value = newScreen
                         }
-                    }
+                    },
+                    showUp = true,
+                    onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
             is Screen.ViewComments -> {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                            navigationIcon = {
-                                IconButton(onClick = { currentScreen.value = Screen.List() }) {
-                                    Icon(Icons.Filled.ArrowBack)
-                                }
-                            },
-                        )
-                    },
-                    bodyContent = {
-                        CommentsScreen(
-                            api = api,
-                            post = screen.post
-                        )
-                    }
+                ScaffoldWithContent(
+                    content = { CommentsScreen(api = api, post = screen.post) },
+                    showUp = true,
+                    onUpaction = { currentScreen.value = Screen.List() }
                 )
-
-                BackButtonHandler(onBackPressed = { currentScreen.value = Screen.List() })
             }
             is Screen.ViewOne -> {
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-                            title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
-                            navigationIcon = {
-                                IconButton(onClick = { currentScreen.value = Screen.List() }) {
-                                    Icon(Icons.Filled.ArrowBack)
-                                }
-                            },
-                        )
-                    },
-                    bodyContent = {
-                        val s = currentScreen.value as Screen.ViewOne
-                        ViewOne(s.post)
-                    }
+                ScaffoldWithContent(
+                    content = { ViewOne((currentScreen.value as Screen.ViewOne).post) },
+                    showUp = false,
+                    onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpaction: () -> Unit) {
+
+    if (showUp) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    navigationIcon = {
+                        IconButton(onClick = { onUpaction() }) {
+                            Icon(Icons.Filled.ArrowBack)
+                        }
+                    },
+                )
+            },
+            bodyContent = { content() }
+        )
+
+        if (showUp) {
+            BackButtonHandler(onBackPressed = { onUpaction() })
+        }
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                )
+            },
+            bodyContent = { content() }
+        )
     }
 }
 
