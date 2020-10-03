@@ -214,6 +214,8 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
         CommentLevelDivider(level = level, modifier = modifier)
 
         Column {
+            Spacer(modifier = Modifier.preferredHeight(15.dp).fillMaxWidth())
+
             SingleComment(comment = comment, modifier)
             CommentHasMore(
                 count = comment.children.size,
@@ -222,7 +224,6 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
             ) {
                 showChildren.value = !showChildren.value
             }
-            Spacer(modifier = Modifier.preferredHeight(10.dp).fillMaxWidth())
         }
     }
 
