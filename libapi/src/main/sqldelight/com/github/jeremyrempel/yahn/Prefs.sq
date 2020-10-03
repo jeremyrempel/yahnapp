@@ -1,0 +1,22 @@
+CREATE TABLE pref (
+        key TEXT PRIMARY KEY,
+        valueString TEXT,
+        valueInt INTEGER,
+        lastUpdated INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+insertString:
+INSERT INTO pref (key, valueString) VALUES (?,?);
+
+updateString:
+UPDATE pref SET valueString = ? WHERE key = ?;
+
+insertInt:
+INSERT INTO pref (key, valueInt) VALUES (?,?);
+
+updateInt:
+UPDATE pref SET valueInt = ? WHERE key = ?;
+
+get:
+SELECT * FROM pref WHERE key = ?;

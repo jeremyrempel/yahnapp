@@ -26,6 +26,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
 
+    api 'com.squareup.sqldelight:coroutines-extensions:1.4.3'
     implementation 'com.squareup.sqldelight:android-driver:1.4.3'
 
     testImplementation "junit:junit:$junit_version"

@@ -29,6 +29,7 @@ import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.Lce
+import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
@@ -37,44 +38,59 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
-import java.lang.Exception
 import java.net.URL
+import java.time.Instant
 import java.util.Date
 
-private suspend fun fetchData(api: HackerNewsApi) = coroutineScope {
+private suspend fun fetchData(api: HackerNewsApi, db: HackerNewsDb) = coroutineScope {
     api.fetchTopItems()
-        .take(50)
         .map {
             async(Dispatchers.IO) {
                 api.fetchItem(it.toLong())
             }
-        }.map {
-            it.await()
-        }.mapIndexed { i, item ->
-            Post(
+        }.forEach {
+            val item = it.await()
+
+            val post = Post(
                 id = item.id.toLong(),
                 title = item.title ?: "",
                 text = item.text,
-                url = if (item.url != null) URL(item.url).toURI().authority else null,
-                domain = "",
+                domain = if (item.url != null) URL(item.url).toURI().authority else null,
+                url = item.url,
                 points = 0,
                 unixTime = item.time * 1000, // seconds to ms
                 commentsCnt = item.descendants?.toLong() ?: 0
             )
+
+            db.store(post)
         }
 }
 
 @Composable
 fun ListContent(
     api: HackerNewsApi,
+    db: HackerNewsDb,
     navigateTo: (Screen) -> Unit
 ) {
     val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
 
     launchInComposition {
         try {
-            val topList = fetchData(api)
-            result.value = Lce.Content(topList)
+            val now = Instant.now().epochSecond
+            val expiration = now - (60 * 5)
+
+            val lastFetch = db.getPref("lastfetch")?.valueInt ?: 0
+            if (lastFetch < expiration) {
+                Timber.d("Last fetch more older than 5m, fetching again")
+                fetchData(api, db)
+                db.savePref("lastfetch", now)
+            } else {
+                Timber.d("Last fetch within last 5m, skipping fetch")
+            }
+
+            val data = db.selectAll()
+
+            result.value = Lce.Content(data)
         } catch (e: Exception) {
             Timber.e(e)
             result.value = Lce.Error(e)
@@ -94,8 +110,10 @@ fun ListContent(
             PostsList(
                 data = data,
                 onSelectPost = { post ->
-                    if (post.url != null) {
-                        launchBrowser(post.url!!, context)
+
+                    val url = post.url
+                    if (url != null) {
+                        launchBrowser(url, context)
                     } else {
                         navigateTo(Screen.ViewOne(post))
                     }

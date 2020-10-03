@@ -14,12 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ContextAmbient
-import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
-import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 
 sealed class Screen {
     data class List(val isLoading: Boolean = false) : Screen()
@@ -30,7 +29,10 @@ sealed class Screen {
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun MainScreen(api: HackerNewsApi) {
+fun MainScreen(
+    api: HackerNewsApi,
+    db: HackerNewsDb
+) {
     val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
 
     // todo combine the scaffolds and animate the topbar
@@ -39,7 +41,7 @@ fun MainScreen(api: HackerNewsApi) {
             is Screen.List -> {
                 ScaffoldWithContent(
                     content = {
-                        ListContent(api) { newScreen ->
+                        ListContent(api, db) { newScreen ->
                             currentScreen.value = newScreen
                         }
                     },
@@ -94,30 +96,6 @@ fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpac
                 )
             },
             bodyContent = { content() }
-        )
-    }
-}
-
-@ExperimentalAnimationApi
-@ExperimentalLayout
-@Preview(showBackground = true)
-@Composable
-fun MainListPreview() {
-    YetAnotherHNAppTheme(false) {
-        MainScreen(
-            HackerNewsApi("", "") {}
-        )
-    }
-}
-
-@ExperimentalAnimationApi
-@ExperimentalLayout
-@Preview(showBackground = true)
-@Composable
-fun MainListDarkPreview() {
-    YetAnotherHNAppTheme(true) {
-        MainScreen(
-            HackerNewsApi("", "") {}
         )
     }
 }

@@ -10,7 +10,7 @@ CREATE TABLE post (
 );
 
 insert:
-INSERT INTO post (id, title, text, domain, url, points, unixTime, commentsCnt)
+INSERT OR REPLACE INTO post (id, title, text, domain, url, points, unixTime, commentsCnt)
 VALUES ?;
 
 selectPosts:
