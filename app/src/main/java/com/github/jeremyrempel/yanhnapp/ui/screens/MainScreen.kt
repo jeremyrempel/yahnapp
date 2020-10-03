@@ -45,7 +45,7 @@ fun MainScreen(
                             currentScreen.value = newScreen
                         }
                     },
-                    showUp = true,
+                    showUp = false,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
@@ -59,7 +59,7 @@ fun MainScreen(
             is Screen.ViewOne -> {
                 ScaffoldWithContent(
                     content = { ViewOne((currentScreen.value as Screen.ViewOne).post) },
-                    showUp = false,
+                    showUp = true,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
