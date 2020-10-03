@@ -7,6 +7,7 @@ object SampleData {
     val posts = listOf(
         Post(
             1,
+            1,
             "Jetpack Compose 1.0 released",
             "developer.android.com",
             "https://developer.android.com",
@@ -17,6 +18,7 @@ object SampleData {
         ),
         Post(
             1,
+            2,
             "First Man on Mars. This is a super long title that should go over the maximum line length.",
             "nasa.gov",
             "https://nasa.gov",
@@ -27,6 +29,7 @@ object SampleData {
         ),
         Post(
             1,
+            3,
             "KMM 1.0.0 released",
             "kotlinlang.org",
             "https://kotlinlang.org",
@@ -37,6 +40,7 @@ object SampleData {
         ),
         Post(
             1,
+            4,
             "Jetpack Compose is Awesome",
             "medium.com",
             "https://medium.com",
@@ -47,6 +51,7 @@ object SampleData {
         ),
         Post(
             1,
+            5,
             "Linus Torvalids announces presidential candidacy",
             "cnn.com",
             "https://cnn.com",
@@ -57,6 +62,7 @@ object SampleData {
         ),
         Post(
             1,
+            6,
             "Ask HN: How can I learn to code?",
             null,
             null,

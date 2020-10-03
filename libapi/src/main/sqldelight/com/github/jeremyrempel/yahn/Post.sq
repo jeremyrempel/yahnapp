@@ -1,5 +1,6 @@
 CREATE TABLE post (
     id INTEGER NOT NULL PRIMARY KEY,
+    rank INTEGER NOT NULL,
     title TEXT NOT NULL,
     text TEXT,
     domain TEXT,
@@ -9,9 +10,11 @@ CREATE TABLE post (
     commentsCnt INTEGER NOT NULL
 );
 
+CREATE INDEX post_rank ON post(rank);
+
 insert:
-INSERT OR REPLACE INTO post (id, title, text, domain, url, points, unixTime, commentsCnt)
+INSERT OR REPLACE INTO post (id, rank, title, text, domain, url, points, unixTime, commentsCnt)
 VALUES ?;
 
 selectPosts:
-SELECT * FROM post;
+SELECT * FROM post ORDER BY rank ASC;

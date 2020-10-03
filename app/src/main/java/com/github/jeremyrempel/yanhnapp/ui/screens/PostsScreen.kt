@@ -48,11 +48,12 @@ private suspend fun fetchData(api: HackerNewsApi, db: HackerNewsDb) = coroutineS
             async(Dispatchers.IO) {
                 api.fetchItem(it.toLong())
             }
-        }.forEach {
-            val item = it.await()
+        }.forEachIndexed { idx, job ->
+            val item = job.await()
 
             val post = Post(
                 id = item.id.toLong(),
+                rank = idx.toLong(),
                 title = item.title ?: "",
                 text = item.text,
                 domain = if (item.url != null) URL(item.url).toURI().authority else null,
