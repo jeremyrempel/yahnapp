@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
+import java.io.IOException
 import java.net.URL
 import java.time.Instant
 import java.util.Date
@@ -77,6 +78,8 @@ fun ListContent(
     val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
 
     launchInComposition {
+
+        // fetch from network
         try {
             val now = Instant.now().epochSecond
             val expiration = now - (60 * 5)
@@ -89,9 +92,20 @@ fun ListContent(
             } else {
                 Timber.d("Last fetch within last 5m, skipping fetch")
             }
+        } catch (e: IOException) {
+            Timber.e(e)
+        } finally {
+            try {
+                val data = db.selectAll()
+                result.value = Lce.Content(data)
+            } catch (e: Exception) {
+                Timber.e(e)
+                result.value = Lce.Error(e)
+            }
+        }
 
+        try {
             val data = db.selectAll()
-
             result.value = Lce.Content(data)
         } catch (e: Exception) {
             Timber.e(e)
