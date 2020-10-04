@@ -29,10 +29,8 @@ ORDER BY top_posts.rank ASC;
 
 CREATE TABLE top_posts (
     id INTEGER NOT NULL PRIMARY KEY,
-    rank INTEGER NOT NULL
+    rank INTEGER UNIQUE NOT NULL
 );
-
-CREATE UNIQUE INDEX post_rank ON top_posts(rank);
 
 truncateTopPosts:
 DELETE FROM top_posts;
