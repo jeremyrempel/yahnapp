@@ -1,20 +1,41 @@
 CREATE TABLE post (
     id INTEGER NOT NULL PRIMARY KEY,
-    rank INTEGER NOT NULL,
     title TEXT NOT NULL,
     text TEXT,
     domain TEXT,
     url TEXT,
     points INTEGER NOT NULL,
     unixTime INTEGER NOT NULL,
-    commentsCnt INTEGER NOT NULL
+    commentsCnt INTEGER NOT NULL,
+    lastUpdated INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX post_rank ON post(rank);
-
 insert:
-INSERT OR REPLACE INTO post (id, rank, title, text, domain, url, points, unixTime, commentsCnt)
-VALUES ?;
+INSERT OR REPLACE INTO post (id, title, text, domain, url, points, unixTime, commentsCnt)
+VALUES (?,?,?,?,?,?,?,?);
 
-selectPosts:
-SELECT * FROM post ORDER BY rank ASC;
+selectPostById:
+SELECT * FROM post WHERE id = ?;
+
+selectPostsByRank:
+SELECT
+    post.*
+FROM
+    top_posts
+JOIN
+    post ON top_posts.id = post.id
+ORDER BY top_posts.rank ASC;
+
+CREATE TABLE top_posts (
+    id INTEGER NOT NULL PRIMARY KEY,
+    rank INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX post_rank ON top_posts(rank);
+
+truncateTopPosts:
+DELETE FROM top_posts;
+
+insertTopPost:
+INSERT INTO top_posts (id, rank) VALUES (?, ?);

@@ -29,12 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.Item
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
-import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
-import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -42,37 +41,68 @@ import timber.log.Timber
 import java.io.IOException
 import java.net.URL
 import java.time.Instant
-import java.util.Date
 
-private suspend fun fetchData(api: HackerNewsApi, db: HackerNewsDb) = coroutineScope {
-    api.fetchTopItems()
-        .map {
-            async(Dispatchers.IO) {
-                api.fetchItem(it.toLong())
-            }
-        }.forEachIndexed { idx, job ->
-            val item = job.await()
+// todo move into a repository
 
-            val domain = if (item.url != null) {
-                URL(item.url).toURI().authority.replaceFirst("www.", "")
-            } else {
-                null
-            }
+private fun Item.toPost(): Post {
+    val item = this
 
-            val post = Post(
-                id = item.id.toLong(),
-                rank = idx.toLong(),
-                title = item.title ?: "",
-                text = item.text,
-                domain = domain,
-                url = item.url,
-                points = 0,
-                unixTime = item.time * 1000, // seconds to ms
-                commentsCnt = item.descendants?.toLong() ?: 0
-            )
+    val domain = if (item.url != null) {
+        URL(item.url).toURI().authority.replaceFirst("www.", "")
+    } else {
+        null
+    }
 
-            db.store(post)
+    val now = Instant.now().epochSecond
+    return Post(
+        id = item.id.toLong(),
+        title = item.title ?: "",
+        text = item.text,
+        domain = domain,
+        url = item.url,
+        points = 0,
+        unixTime = item.time,
+        commentsCnt = item.descendants?.toLong() ?: 0,
+        now,
+        now
+    )
+}
+
+private suspend fun fetchAndStore(api: HackerNewsApi, db: HackerNewsDb) = coroutineScope {
+    // fetch from network and store
+    try {
+        val now = Instant.now().epochSecond
+        val expiration = now - (60 * 5)
+
+        val lastFetch = db.getPref("lastfetch")?.valueInt ?: 0
+        if (lastFetch < expiration) {
+            Timber.d("Last fetch more older than 5m, fetching again")
+            db.savePref("lastfetch", now)
+
+            Timber.d("fetching top items")
+            val topItems = api.fetchTopItems().map { it.toLong() }
+            db.replaceTopPosts(topItems)
+
+            topItems.map { id ->
+                // query db async
+                val job = async { db.selectPostById(id) }
+                Pair(id, job)
+            }.map { p ->
+                Pair(p.first, p.second.await())
+            }.map { postDb ->
+                // fetch from db if not already stored
+                async(Dispatchers.IO) {
+                    if (postDb.second == null) {
+                        db.store(api.fetchItem(postDb.first).toPost())
+                    }
+                }
+            }.map { it.await() }
+        } else {
+            Timber.d("Last fetch within last 5m, skipping fetch")
         }
+    } catch (e: IOException) {
+        Timber.e(e)
+    }
 }
 
 @Composable
@@ -83,39 +113,20 @@ fun ListContent(
 ) {
     val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
 
-    launchInComposition {
+    if (result.value is Lce.Loading) {
 
-        // fetch from network
-        try {
-            val now = Instant.now().epochSecond
-            val expiration = now - (60 * 5)
+        launchInComposition {
 
-            val lastFetch = db.getPref("lastfetch")?.valueInt ?: 0
-            if (lastFetch < expiration) {
-                Timber.d("Last fetch more older than 5m, fetching again")
-                fetchData(api, db)
-                db.savePref("lastfetch", now)
-            } else {
-                Timber.d("Last fetch within last 5m, skipping fetch")
-            }
-        } catch (e: IOException) {
-            Timber.e(e)
-        } finally {
+            fetchAndStore(api, db)
+
+            // query from db
             try {
-                val data = db.selectAll()
+                val data = db.selectAllPostsByRank()
                 result.value = Lce.Content(data)
             } catch (e: Exception) {
                 Timber.e(e)
                 result.value = Lce.Error(e)
             }
-        }
-
-        try {
-            val data = db.selectAll()
-            result.value = Lce.Content(data)
-        } catch (e: Exception) {
-            Timber.e(e)
-            result.value = Lce.Error(e)
         }
     }
 
@@ -173,6 +184,15 @@ fun PostsList(
 @Composable
 fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
 
+    val relativeDate =
+        remember(post) {
+            DateUtils.getRelativeTimeSpanString(
+                post.unixTime * 1000,
+                Instant.now().toEpochMilli(),
+                0
+            ).toString()
+        }
+
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 5.dp, end = 5.dp)
 
@@ -202,9 +222,6 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                         )
                     }
 
-                    val relativeDate =
-                        DateUtils.getRelativeTimeSpanString(post.unixTime, Date().time, 0)
-                            .toString()
                     Text(
                         text = relativeDate,
                         style = MaterialTheme.typography.body2,
@@ -239,7 +256,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
 @Preview(showBackground = true)
 @Composable
 fun PostsRowPreview() {
-    YetAnotherHNAppTheme(darkTheme = false) {
-        PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
-    }
+    // YetAnotherHNAppTheme(darkTheme = false) {
+    //     PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
+    // }
 }

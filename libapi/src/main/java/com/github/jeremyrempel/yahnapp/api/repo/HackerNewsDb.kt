@@ -19,13 +19,37 @@ class HackerNewsDb(
 
     suspend fun store(post: Post) = coroutineScope {
         launch(Dispatchers.IO) {
-            database.postQueries.insert(post)
+            database.postQueries.insert(
+                post.id,
+                post.title,
+                post.text,
+                post.domain,
+                post.url,
+                post.points,
+                post.unixTime,
+                post.commentsCnt
+            )
         }
     }
 
-    suspend fun selectAll(): List<Post> = coroutineScope {
+    suspend fun selectPostById(id: Long): Post? = coroutineScope {
         withContext(Dispatchers.IO) {
-            database.postQueries.selectPosts().executeAsList()
+            database.postQueries.selectPostById(id).executeAsOneOrNull()
+        }
+    }
+
+    suspend fun selectAllPostsByRank(): List<Post> = coroutineScope {
+        withContext(Dispatchers.IO) {
+            database.postQueries.selectPostsByRank().executeAsList()
+        }
+    }
+
+    suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
+        launch(Dispatchers.IO) {
+            database.postQueries.truncateTopPosts()
+            topPosts.forEachIndexed { rank, postId ->
+                database.postQueries.insertTopPost(postId, rank.toLong())
+            }
         }
     }
 
