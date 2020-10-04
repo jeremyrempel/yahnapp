@@ -72,7 +72,7 @@ private suspend fun fetchAndStore(api: HackerNewsApi, db: HackerNewsDb) = corout
     // fetch from network and store
     try {
         val now = Instant.now().epochSecond
-        val expiration = now - (60 * 5)
+        val expiration = now - (60 * 5) // 5 minutes ago
 
         val lastFetch = db.getPref("lastfetch")?.valueInt ?: 0
         if (lastFetch < expiration) {
