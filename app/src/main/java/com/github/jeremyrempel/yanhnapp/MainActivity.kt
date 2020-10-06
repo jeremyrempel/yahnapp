@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val api = HackerNewsApi(networkDebug = Timber::d)
+        val api = HackerNewsApi(context = application, networkDebug = Timber::d)
         val db = HackerNewsDb(applicationContext)
 
         setContent {
