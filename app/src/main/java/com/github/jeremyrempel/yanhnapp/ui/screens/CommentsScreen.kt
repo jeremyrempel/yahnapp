@@ -265,7 +265,7 @@ fun CommentLevelDivider(level: Int, modifier: Modifier) {
             modifier = modifier.fillMaxHeight().preferredWidth(3.dp)
         )
     }
-    Spacer(modifier = modifier.preferredWidth(10.dp))
+    Spacer(modifier = modifier.preferredWidth(15.dp))
 }
 
 @ExperimentalAnimationApi
