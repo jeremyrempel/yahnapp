@@ -33,7 +33,9 @@ import com.github.jeremyrempel.yahnapp.api.Item
 import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
+import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
+import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -256,7 +258,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
 @Preview(showBackground = true)
 @Composable
 fun PostsRowPreview() {
-    // YetAnotherHNAppTheme(darkTheme = false) {
-    //     PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
-    // }
+    YetAnotherHNAppTheme(darkTheme = false) {
+        PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
+    }
 }
