@@ -4,6 +4,7 @@ import androidx.compose.foundation.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -28,6 +29,8 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
         color = MaterialTheme.colors.primaryVariant
     )
 
+    val paragraph = ParagraphStyle()
+
     val formattedString = remember(html) {
         annotatedString {
 
@@ -48,6 +51,7 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                                 "i" -> pushStyle(italic)
                                 "u" -> pushStyle(underline)
                                 "br" -> appendAndUpdateCursor("\n")
+                                "p" -> pushStyle(paragraph)
                                 "a" -> {
                                     val start = cursorPosition
                                     val end = start + node.text().length
@@ -78,7 +82,10 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                     if (node is Element) {
                         when (node.tagName()) {
                             "b", "i", "u", "a" -> pop()
-                            "p" -> appendAndUpdateCursor("\n\n") // todo use paragraph styles
+                            "p" -> {
+                                appendAndUpdateCursor("\n")
+                                pop()
+                            }
                         }
                     }
                 }
