@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
@@ -46,12 +47,13 @@ import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yahnapp.api.model.Comment
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
+import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.apache.commons.text.StringEscapeUtils
 import timber.log.Timber
 import java.util.Date
 
@@ -132,17 +134,13 @@ fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
 @Composable
 fun SingleComment(comment: Comment, modifier: Modifier) {
 
-    val contentEscape = remember(comment.content) {
-        StringEscapeUtils.unescapeHtml4(comment.content)
-            .replace("<p>", "\n")
-            .replace("</p>", "")
-    }
-
     val timeRelative = remember(comment.unixTimeMs) {
         DateUtils
             .getRelativeTimeSpanString(comment.unixTimeMs, Date().time, 0)
             .toString()
     }
+
+    val context = ContextAmbient.current
 
     Column(
         modifier = modifier.padding(end = 10.dp)
@@ -161,10 +159,9 @@ fun SingleComment(comment: Comment, modifier: Modifier) {
                 style = MaterialTheme.typography.subtitle1
             )
         }
-        Text(
-            text = contentEscape,
-            style = MaterialTheme.typography.body1
-        )
+        HtmlText(html = comment.content) { url ->
+            launchBrowser(url, context)
+        }
     }
 }
 

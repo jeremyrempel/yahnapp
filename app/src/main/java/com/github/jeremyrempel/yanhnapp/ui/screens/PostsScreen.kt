@@ -1,10 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
-import android.content.Context
-import android.net.Uri
 import android.text.format.DateUtils
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
@@ -36,6 +32,7 @@ import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -159,15 +156,6 @@ fun ListContent(
             )
         }
     }
-}
-
-fun launchBrowser(url: String, context: Context) {
-    CustomTabsIntent.Builder()
-        .setShowTitle(true)
-        .setShareState(SHARE_STATE_ON)
-        .setUrlBarHidingEnabled(true)
-        .build()
-        .launchUrl(context, Uri.parse(url))
 }
 
 @Composable
