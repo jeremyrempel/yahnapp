@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.ExperimentalLayout
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
@@ -13,7 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.res.stringResource
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
@@ -34,6 +35,7 @@ fun MainScreen(
     db: HackerNewsDb
 ) {
     val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
+    val scrollState = rememberLazyListState()
 
     // todo combine the scaffolds and animate the topbar
     Crossfade(currentScreen.value) { screen ->
@@ -41,7 +43,7 @@ fun MainScreen(
             is Screen.List -> {
                 ScaffoldWithContent(
                     content = {
-                        ListContent(api, db) { newScreen ->
+                        ListContent(api, db, scrollState) { newScreen ->
                             currentScreen.value = newScreen
                         }
                     },

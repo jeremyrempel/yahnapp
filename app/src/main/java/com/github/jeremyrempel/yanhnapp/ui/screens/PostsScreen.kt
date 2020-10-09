@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -108,6 +110,7 @@ private suspend fun fetchAndStore(api: HackerNewsApi, db: HackerNewsDb) = corout
 fun ListContent(
     api: HackerNewsApi,
     db: HackerNewsDb,
+    scrollState: LazyListState,
     navigateTo: (Screen) -> Unit
 ) {
     val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
@@ -141,6 +144,7 @@ fun ListContent(
 
             PostsList(
                 data = data,
+                scrollState,
                 onSelectPost = { post ->
 
                     val url = post.url
@@ -161,11 +165,13 @@ fun ListContent(
 @Composable
 fun PostsList(
     data: List<Post>,
+    scrollState: LazyListState,
     onSelectPost: (Post) -> Unit,
     onSelectPostComment: (Post) -> Unit
 ) {
     LazyColumnFor(
-        items = data
+        items = data,
+        state = scrollState
     ) { row ->
         PostRow(row, onSelectPost, onSelectPostComment)
     }
@@ -247,6 +253,9 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
 @Composable
 fun PostsRowPreview() {
     YetAnotherHNAppTheme(darkTheme = false) {
-        PostsList(data = SampleData.posts, onSelectPost = {}, onSelectPostComment = {})
+        PostsList(
+            data = SampleData.posts,
+            rememberLazyListState(), onSelectPost = {},
+            onSelectPostComment = {})
     }
 }
