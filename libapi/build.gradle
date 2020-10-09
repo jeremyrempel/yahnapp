@@ -34,7 +34,7 @@ dependencies {
 
     // database
     api 'com.squareup.sqldelight:coroutines-extensions:1.4.4'
-    implementation 'com.squareup.sqldelight:android-driver:1.4.3'
+    implementation 'com.squareup.sqldelight:android-driver:1.4.4'
 
     testImplementation "junit:junit:$junit_version"
 }
