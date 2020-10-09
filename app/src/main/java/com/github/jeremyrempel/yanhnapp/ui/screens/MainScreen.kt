@@ -74,7 +74,7 @@ fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpac
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    title = { Text(stringResource(R.string.app_name)) },
                     navigationIcon = {
                         IconButton(onClick = { onUpaction() }) {
                             Icon(Icons.Filled.ArrowBack)
@@ -92,7 +92,7 @@ fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpac
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(ContextAmbient.current.getString(R.string.app_name)) },
+                    title = { Text(stringResource(R.string.app_name)) },
                 )
             },
             bodyContent = { content() }
