@@ -54,7 +54,7 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                                 "p" -> {
                                     pushStyle(paragraph)
 
-                                    if(cursorPosition > 0) {
+                                    if (cursorPosition > 0) {
                                         appendAndUpdateCursor("\n")
                                     }
                                 }

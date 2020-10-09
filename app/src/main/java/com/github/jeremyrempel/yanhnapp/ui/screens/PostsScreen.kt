@@ -256,6 +256,7 @@ fun PostsRowPreview() {
         PostsList(
             data = SampleData.posts,
             rememberLazyListState(), onSelectPost = {},
-            onSelectPostComment = {})
+            onSelectPostComment = {}
+        )
     }
 }
