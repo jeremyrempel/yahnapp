@@ -51,7 +51,13 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                                 "i" -> pushStyle(italic)
                                 "u" -> pushStyle(underline)
                                 "br" -> appendAndUpdateCursor("\n")
-                                "p" -> pushStyle(paragraph)
+                                "p" -> {
+                                    pushStyle(paragraph)
+
+                                    if(cursorPosition > 0) {
+                                        appendAndUpdateCursor("\n")
+                                    }
+                                }
                                 "a" -> {
                                     val start = cursorPosition
                                     val end = start + node.text().length
@@ -83,7 +89,6 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                         when (node.tagName()) {
                             "b", "i", "u", "a" -> pop()
                             "p" -> {
-                                appendAndUpdateCursor("\n")
                                 pop()
                             }
                         }
