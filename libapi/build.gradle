@@ -18,7 +18,7 @@ java {
 
 dependencies {
     // network
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
+    api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
     implementation "io.ktor:ktor-client-okhttp:$ktor_version"
     implementation "io.ktor:ktor-client-serialization:${ktor_version}"
     implementation "io.ktor:ktor-client-logging:${ktor_version}"

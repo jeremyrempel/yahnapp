@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yahnapp.api
 
+import com.github.jeremyrempel.yahnapp.api.model.Item
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.compression.ContentEncoding

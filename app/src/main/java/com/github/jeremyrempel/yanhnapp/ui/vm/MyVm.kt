@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
-import com.github.jeremyrempel.yahnapp.api.Item
 import com.github.jeremyrempel.yahnapp.api.model.Comment
+import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

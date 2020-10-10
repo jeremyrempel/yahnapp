@@ -1,5 +1,7 @@
 package com.github.jeremyrempel.yahnapp.api
 
+import com.github.jeremyrempel.yahnapp.api.model.Item
+import com.github.jeremyrempel.yahnapp.api.model.ItemType
 import junit.framework.TestCase.assertEquals
 import kotlinx.serialization.json.Json
 import org.intellij.lang.annotations.Language

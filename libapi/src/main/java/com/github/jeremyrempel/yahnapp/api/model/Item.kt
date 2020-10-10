@@ -1,5 +1,6 @@
-package com.github.jeremyrempel.yahnapp.api
+package com.github.jeremyrempel.yahnapp.api.model
 
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,6 +20,7 @@ data class Item(
     val dead: Boolean = false
 )
 
+@Keep
 enum class ItemType {
     job, story, comment, poll, pollopt
 }
