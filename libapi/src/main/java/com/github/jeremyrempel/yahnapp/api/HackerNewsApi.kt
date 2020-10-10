@@ -1,7 +1,6 @@
 package com.github.jeremyrempel.yahnapp.api
 
 import android.app.Application
-import com.chuckerteam.chucker.api.ChuckerInterceptor
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.compression.ContentEncoding
@@ -20,9 +19,6 @@ class HackerNewsApi(
     private val networkDebug: (String) -> Unit
 ) {
     private val client = HttpClient(OkHttp) {
-        engine {
-            addInterceptor(ChuckerInterceptor(context))
-        }
         install(JsonFeature) {
             val config = Json.Default
             serializer = KotlinxSerializer(config)

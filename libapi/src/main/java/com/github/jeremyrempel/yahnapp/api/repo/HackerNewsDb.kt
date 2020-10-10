@@ -1,21 +1,28 @@
 package com.github.jeremyrempel.yahnapp.api.repo
 
-import android.content.Context
+import android.app.Application
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahn.Pref
 import com.github.jeremyrempel.yanhnapp.lib.Database
 import com.squareup.sqldelight.android.AndroidSqliteDriver
-import com.squareup.sqldelight.db.SqlDriver
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HackerNewsDb(
-    context: Context
+    context: Application
 ) {
-    private val driver: SqlDriver = AndroidSqliteDriver(Database.Schema, context, "yahn.db")
+
+    private val driver = AndroidSqliteDriver(Database.Schema, context, "yahn.db")
     private val database = Database(driver)
+
+    fun close() {
+        driver.close()
+    }
 
     suspend fun store(post: Post) = coroutineScope {
         launch(Dispatchers.IO) {
@@ -38,9 +45,9 @@ class HackerNewsDb(
         }
     }
 
-    suspend fun selectAllPostsByRank(): List<Post> = coroutineScope {
+    suspend fun selectAllPostsByRank(): Flow<List<Post>> = coroutineScope {
         withContext(Dispatchers.IO) {
-            database.postQueries.selectPostsByRank().executeAsList()
+            database.postQueries.selectPostsByRank().asFlow().mapToList()
         }
     }
 

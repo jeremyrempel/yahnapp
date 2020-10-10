@@ -28,10 +28,6 @@ dependencies {
     // coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
 
-    // network debug
-    debugImplementation "com.github.chuckerteam.chucker:library:3.3.0"
-    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.3.0"
-
     // database
     api 'com.squareup.sqldelight:coroutines-extensions:1.4.4'
     implementation 'com.squareup.sqldelight:android-driver:1.4.4'

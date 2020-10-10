@@ -15,8 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.launchInComposition
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,141 +23,44 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
-import com.github.jeremyrempel.yahnapp.api.Item
-import com.github.jeremyrempel.yahnapp.api.Lce
-import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import timber.log.Timber
-import java.io.IOException
-import java.net.URL
 import java.time.Instant
-
-// todo move into a repository
-
-private fun Item.toPost(): Post {
-    val item = this
-
-    val domain = if (item.url != null) {
-        URL(item.url).toURI().authority.replaceFirst("www.", "")
-    } else {
-        null
-    }
-
-    val now = Instant.now().epochSecond
-    return Post(
-        id = item.id.toLong(),
-        title = item.title ?: "",
-        text = item.text,
-        domain = domain,
-        url = item.url,
-        points = 0,
-        unixTime = item.time,
-        commentsCnt = item.descendants?.toLong() ?: 0,
-        now,
-        now
-    )
-}
-
-private suspend fun fetchAndStore(api: HackerNewsApi, db: HackerNewsDb) = coroutineScope {
-    // fetch from network and store
-    try {
-        val now = Instant.now().epochSecond
-        val expiration = now - (60 * 5) // 5 minutes ago
-
-        val lastFetch = db.getPref("lastfetch")?.valueInt ?: 0
-        if (lastFetch < expiration) {
-            Timber.d("Last fetch more older than 5m, fetching again")
-            db.savePref("lastfetch", now)
-
-            Timber.d("fetching top items")
-            val topItems = api.fetchTopItems().map { it.toLong() }
-            db.replaceTopPosts(topItems)
-
-            topItems.map { id ->
-                // query db async
-                val job = async { db.selectPostById(id) }
-                Pair(id, job)
-            }.map { p ->
-                Pair(p.first, p.second.await())
-            }.map { postDb ->
-                // fetch from db if not already stored
-                async(Dispatchers.IO) {
-                    if (postDb.second == null) {
-                        db.store(api.fetchItem(postDb.first).toPost())
-                    }
-                }
-            }.map { it.await() }
-        } else {
-            Timber.d("Last fetch within last 5m, skipping fetch")
-        }
-    } catch (e: IOException) {
-        Timber.e(e)
-    }
-}
 
 @Composable
 fun ListContent(
-    api: HackerNewsApi,
-    db: HackerNewsDb,
     scrollState: LazyListState,
     navigateTo: (Screen) -> Unit
 ) {
-    val result = remember { mutableStateOf<Lce<List<Post>>>(Lce.Loading()) }
+    val vm: MyVm = viewModel()
+    val posts = vm.posts.observeAsState(emptyList())
 
-    if (result.value is Lce.Loading) {
-
-        launchInComposition {
-
-            fetchAndStore(api, db)
-
-            // query from db
-            try {
-                val data = db.selectAllPostsByRank()
-                result.value = Lce.Content(data)
-            } catch (e: Exception) {
-                Timber.e(e)
-                result.value = Lce.Error(e)
-            }
-        }
-    }
-
-    when (result.value) {
-        is Lce.Loading -> Loading()
-        is Lce.Error -> {
-            val errorMsg = (result.value as Lce.Error).error.message ?: "Unknown Error"
-            Text(errorMsg)
-        }
-        else -> {
-            val context = ContextAmbient.current
-            val data = (result.value as Lce.Content).data
-
-            PostsList(
-                data = data,
-                scrollState,
-                onSelectPost = { post ->
-
-                    val url = post.url
-                    if (url != null) {
-                        launchBrowser(url, context)
-                    } else {
-                        navigateTo(Screen.ViewOne(post))
-                    }
-                },
-                onSelectPostComment = { post ->
-                    navigateTo(Screen.ViewComments(post))
+    if (posts.value.isEmpty()) {
+        Loading()
+    } else {
+        val context = ContextAmbient.current
+        PostsList(
+            data = posts.value,
+            scrollState,
+            onSelectPost = { post ->
+                val url = post.url
+                if (url != null) {
+                    launchBrowser(url, context)
+                } else {
+                    navigateTo(Screen.ViewOne(post))
                 }
-            )
-        }
+            },
+            onSelectPostComment = { post ->
+                navigateTo(Screen.ViewComments(post))
+            }
+        )
     }
 }
 

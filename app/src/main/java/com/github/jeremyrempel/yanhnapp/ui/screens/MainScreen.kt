@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
-import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 
@@ -31,8 +30,7 @@ sealed class Screen {
 @ExperimentalLayout
 @Composable
 fun MainScreen(
-    api: HackerNewsApi,
-    db: HackerNewsDb
+    api: HackerNewsApi
 ) {
     val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
     val scrollState = rememberLazyListState()
@@ -43,7 +41,7 @@ fun MainScreen(
             is Screen.List -> {
                 ScaffoldWithContent(
                     content = {
-                        ListContent(api, db, scrollState) { newScreen ->
+                        ListContent(scrollState) { newScreen ->
                             currentScreen.value = newScreen
                         }
                     },
