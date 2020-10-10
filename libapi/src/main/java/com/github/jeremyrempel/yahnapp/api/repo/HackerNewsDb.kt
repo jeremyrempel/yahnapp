@@ -10,7 +10,6 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HackerNewsDb(
@@ -25,18 +24,16 @@ class HackerNewsDb(
     }
 
     suspend fun store(post: Post) = coroutineScope {
-        launch(Dispatchers.IO) {
-            database.postQueries.insert(
-                post.id,
-                post.title,
-                post.text,
-                post.domain,
-                post.url,
-                post.points,
-                post.unixTime,
-                post.commentsCnt
-            )
-        }
+        database.postQueries.insert(
+            post.id,
+            post.title,
+            post.text,
+            post.domain,
+            post.url,
+            post.points,
+            post.unixTime,
+            post.commentsCnt
+        )
     }
 
     suspend fun selectPostById(id: Long): Post? = coroutineScope {
@@ -46,17 +43,13 @@ class HackerNewsDb(
     }
 
     suspend fun selectAllPostsByRank(): Flow<List<Post>> = coroutineScope {
-        withContext(Dispatchers.IO) {
-            database.postQueries.selectPostsByRank().asFlow().mapToList()
-        }
+        database.postQueries.selectPostsByRank().asFlow().mapToList()
     }
 
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
-        launch(Dispatchers.IO) {
-            database.postQueries.truncateTopPosts()
-            topPosts.forEachIndexed { rank, postId ->
-                database.postQueries.insertTopPost(postId, rank.toLong())
-            }
+        database.postQueries.truncateTopPosts()
+        topPosts.forEachIndexed { rank, postId ->
+            database.postQueries.insertTopPost(postId, rank.toLong())
         }
     }
 

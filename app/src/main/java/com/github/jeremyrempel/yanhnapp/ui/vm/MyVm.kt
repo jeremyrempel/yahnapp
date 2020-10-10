@@ -10,12 +10,12 @@ import com.github.jeremyrempel.yahnapp.api.Item
 import com.github.jeremyrempel.yahnapp.api.model.Comment
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.IOException
 import java.net.URL
 import java.time.Instant
 
@@ -23,22 +23,30 @@ class MyVm(application: Application) : AndroidViewModel(application) {
 
     val posts = MutableLiveData<List<Post>>()
     val comments = MutableLiveData<List<Comment>>()
+    val errorMsg = MutableLiveData<String?>()
+
     private var currentPost: Long = -1
 
     private val db = lazy { HackerNewsDb(application) }
-    private val api = lazy { HackerNewsApi(context = application, networkDebug = Timber::d) }
+    private val api = lazy { HackerNewsApi(networkDebug = Timber::d) }
 
     fun requestPosts() {
         viewModelScope.launch {
-            // fetchAndStore(api, db)
-            fetchAndStore()
 
-            db.value.selectAllPostsByRank()
-                .collectLatest {
-                    // don't update ui on every update
-                    delay(100)
-                    posts.postValue(it)
-                }
+            async(Dispatchers.IO) {
+                fetchAndStore()
+            }
+
+            async {
+                db.value.selectAllPostsByRank()
+                    .collectLatest {
+                        // don't update ui on every update
+                        delay(100)
+                        if (it.size > 20) {
+                            posts.postValue(it)
+                        }
+                    }
+            }
         }
     }
 
@@ -47,9 +55,15 @@ class MyVm(application: Application) : AndroidViewModel(application) {
             currentPost = id
             comments.value = emptyList()
 
-            viewModelScope.launch {
-                val result = fetchCommentsForPost(id)
-                comments.postValue(result)
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    errorMsg.postValue(null)
+                    val result = fetchCommentsForPost(id)
+                    comments.postValue(result)
+                } catch (e: IOException) {
+                    errorMsg.postValue(e.message)
+                    Timber.e(e)
+                }
             }
         }
     }
@@ -57,7 +71,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
     /**
      * Given list of trees, fetch all leafs and metadata
      */
-    private suspend fun fetchCommentsForPost(postId: Long) = coroutineScope {
+    private suspend fun fetchCommentsForPost(postId: Long): List<Comment> {
         val api = api.value
 
         // dfs
@@ -68,7 +82,6 @@ class MyVm(application: Application) : AndroidViewModel(application) {
 
                     // recurse
                     val commentChildren = getCommentsByIds(item.kids ?: listOf(), level + 1)
-
                     Comment(
                         item.by ?: "",
                         item.time * 1000,
@@ -87,9 +100,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         val kids = (api.fetchItem(postId).kids ?: emptyList())
 
         // dfs start
-        withContext(Dispatchers.IO) {
-            getCommentsByIds(kids)
-        }
+        return getCommentsByIds(kids)
     }
 
     private fun Item.toPost(): Post {
@@ -117,26 +128,28 @@ class MyVm(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Fetch and store. If api failures error will be captured
+     * Fetch and store
      */
-    private suspend fun fetchAndStore() = viewModelScope.launch {
-        try {
-            withContext(Dispatchers.IO) {
-                val api = api.value
-                api.fetchTopItems()
-                    .map { it.toLong() }
-                    .also { topItems ->
-                        db.value.replaceTopPosts(topItems)
+    private suspend fun fetchAndStore() {
+        errorMsg.postValue(null)
 
-                        topItems.map { itemId ->
-                            api
-                                .fetchItem(itemId)
-                                .toPost()
-                                .also { p -> db.value.store(p) }
-                        }
+        try {
+            val api = api.value
+
+            api.fetchTopItems()
+                .map { it.toLong() }
+                .also { topItems ->
+                    db.value.replaceTopPosts(topItems)
+
+                    topItems.map { itemId ->
+                        api
+                            .fetchItem(itemId)
+                            .toPost()
+                            .also { p -> db.value.store(p) }
                     }
-            }
+                }
         } catch (e: Exception) {
+            errorMsg.postValue(e.message)
             Timber.e(e)
         }
     }

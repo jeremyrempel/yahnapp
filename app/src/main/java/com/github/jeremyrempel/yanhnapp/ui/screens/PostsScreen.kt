@@ -41,9 +41,14 @@ fun ListContent(
 ) {
     val vm: MyVm = viewModel()
     val posts = vm.posts.observeAsState(emptyList())
+    val error = vm.errorMsg.observeAsState()
 
     if (posts.value.isEmpty()) {
-        Loading()
+        if (!error.value.isNullOrEmpty()) {
+            Text("Error: ${error.value}")
+        } else {
+            Loading()
+        }
     } else {
         val context = ContextAmbient.current
         PostsList(

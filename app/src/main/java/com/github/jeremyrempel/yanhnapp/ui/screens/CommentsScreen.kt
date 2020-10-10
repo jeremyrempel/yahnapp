@@ -64,11 +64,18 @@ fun CommentsScreen(post: Post) {
     vm.requestComments(post.id)
 
     val data = vm.comments.observeAsState(initial = emptyList())
+    val error = vm.errorMsg.observeAsState()
 
-    if (data.value.isNotEmpty()) {
-        CommentList(comments = data.value)
-    } else {
-        Loading()
+    when {
+        !error.value.isNullOrEmpty() -> {
+            Text("Error: ${error.value}")
+        }
+        data.value.isNotEmpty() -> {
+            CommentList(comments = data.value)
+        }
+        else -> {
+            Loading()
+        }
     }
 }
 
