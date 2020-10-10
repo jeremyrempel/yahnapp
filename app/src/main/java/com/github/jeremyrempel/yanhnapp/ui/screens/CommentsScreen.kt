@@ -29,7 +29,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.launchInComposition
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,83 +40,35 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
-import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yahnapp.api.model.Comment
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
+import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import timber.log.Timber
 import java.util.Date
 
 const val animationTime = 300
 
-/**
- * Given list of trees, fetch all leafs and metadata
- */
-suspend fun getCommentsForPost(postId: Long, api: HackerNewsApi) = coroutineScope {
-
-    // dfs
-    suspend fun getCommentsByIds(commentIds: List<Long>): List<Comment> {
-        return commentIds
-            .map {
-                async(Dispatchers.IO) {
-                    api.fetchItem(it)
-                }
-            }.map { it.await() }
-            .map { item ->
-                // recurse
-                val commentChildren = getCommentsByIds(item.kids ?: listOf())
-
-                Comment(
-                    item.by ?: "",
-                    item.time * 1000,
-                    item.text ?: "",
-                    commentChildren
-                )
-            }
-    }
-
-    val kids = (api.fetchItem(postId).kids ?: emptyList())
-
-    // dfs start
-    getCommentsByIds(kids)
-}
-
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun CommentsScreen(api: HackerNewsApi, post: Post) {
+fun CommentsScreen(post: Post) {
 
-    val result = remember(post.id) { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
+    val vm = viewModel<MyVm>()
+    vm.requestComments(post.id)
 
-    launchInComposition {
-        try {
-            result.value = Lce.Content(getCommentsForPost(post.id, api))
-        } catch (e: Exception) {
-            Timber.e(e)
-            result.value = Lce.Error(e)
-        }
-    }
+    val data = vm.comments.observeAsState(initial = emptyList())
 
-    when (result.value) {
-        is Lce.Loading -> Loading()
-        is Lce.Error -> {
-            val errorMsg = (result.value as Lce.Error).error.message ?: "Unknown Error"
-            Text(errorMsg)
-        }
-        is Lce.Content -> {
-            val contentResult = result.value as Lce.Content
-            CommentList(comments = contentResult.data)
-        }
+    if (data.value.isNotEmpty()) {
+        CommentList(comments = data.value)
+    } else {
+        Loading()
     }
 }
 

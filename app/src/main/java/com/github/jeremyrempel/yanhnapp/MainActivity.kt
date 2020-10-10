@@ -14,19 +14,18 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
+    private val vm: MyVm by viewModels()
+
     @ExperimentalLayout
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val vm: MyVm by viewModels()
-        vm.start()
-
-        val api = HackerNewsApi(context = application, networkDebug = Timber::d)
+        vm.requestPosts()
 
         setContent {
             YetAnotherHNAppTheme {
-                MainScreen(api)
+                MainScreen()
             }
         }
     }
