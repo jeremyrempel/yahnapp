@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,19 +41,19 @@ fun ListContent(
     navigateTo: (Screen) -> Unit
 ) {
     val vm: MyVm = viewModel()
-    val posts = vm.posts.observeAsState(emptyList())
-    val error = vm.errorMsg.observeAsState()
+    val posts by vm.posts.observeAsState(emptyList())
+    val error by vm.errorMsg.observeAsState()
 
-    if (posts.value.isEmpty()) {
-        if (!error.value.isNullOrEmpty()) {
-            Text("Error: ${error.value}")
+    if (posts.isEmpty()) {
+        if (!error.isNullOrEmpty()) {
+            Text("Error: $error")
         } else {
             Loading()
         }
     } else {
         val context = ContextAmbient.current
         PostsList(
-            data = posts.value,
+            data = posts,
             scrollState,
             onSelectPost = { post ->
                 val url = post.url
