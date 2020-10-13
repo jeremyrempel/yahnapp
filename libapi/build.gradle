@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-android-extensions'
 
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
-    id 'com.squareup.sqldelight' version "1.4.3"
+    id 'com.squareup.sqldelight' version "1.4.4"
 }
 
 android {
