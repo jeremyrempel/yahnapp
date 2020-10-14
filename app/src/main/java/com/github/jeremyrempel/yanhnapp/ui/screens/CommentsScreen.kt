@@ -29,7 +29,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -63,8 +63,8 @@ fun CommentsScreen(post: Post) {
     val vm = viewModel<MyVm>()
     vm.requestComments(post.id)
 
-    val data = vm.comments.observeAsState(initial = emptyList())
-    val error = vm.errorMsg.observeAsState()
+    val data = vm.comments.collectAsState()
+    val error = vm.errorMsg.collectAsState()
 
     when {
         !error.value.isNullOrEmpty() -> {

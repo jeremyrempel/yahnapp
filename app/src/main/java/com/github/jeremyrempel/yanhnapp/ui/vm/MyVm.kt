@@ -2,7 +2,6 @@ package com.github.jeremyrempel.yanhnapp.ui.vm
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
@@ -10,8 +9,12 @@ import com.github.jeremyrempel.yahnapp.api.model.Comment
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -19,11 +22,17 @@ import java.io.IOException
 import java.net.URL
 import java.time.Instant
 
+@ExperimentalCoroutinesApi
 class MyVm(application: Application) : AndroidViewModel(application) {
 
-    val posts = MutableLiveData<List<Post>>()
-    val comments = MutableLiveData<List<Comment>>()
-    val errorMsg = MutableLiveData<String?>()
+    private val _posts = MutableStateFlow<List<Post>>(emptyList())
+    val posts: StateFlow<List<Post>> = _posts.asStateFlow()
+
+    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
+    val comments = _comments.asStateFlow()
+
+    private val _errorMsg = MutableStateFlow<String?>(null)
+    val errorMsg = _errorMsg.asStateFlow()
 
     private var currentPost: Long = -1
 
@@ -37,13 +46,14 @@ class MyVm(application: Application) : AndroidViewModel(application) {
                 fetchAndStore()
             }
 
+            // todo is there a better way to wire this together?
             async {
                 db.value.selectAllPostsByRank()
                     .collectLatest {
                         // don't update ui on every update
                         delay(100)
                         if (it.size > 20) {
-                            posts.postValue(it)
+                            _posts.value = it
                         }
                     }
             }
@@ -53,15 +63,15 @@ class MyVm(application: Application) : AndroidViewModel(application) {
     fun requestComments(id: Long) {
         if (currentPost != id) {
             currentPost = id
-            comments.value = emptyList()
+            _comments.value = emptyList()
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    errorMsg.postValue(null)
+                    _errorMsg.value = null
                     val result = fetchCommentsForPost(id)
-                    comments.postValue(result)
+                    _comments.value = result
                 } catch (e: IOException) {
-                    errorMsg.postValue(e.message)
+                    _errorMsg.value = e.message
                     Timber.e(e)
                 }
             }
@@ -91,7 +101,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
                 }
 
             if (level == 1) {
-                comments.postValue(commentList)
+                _comments.value = commentList
             }
 
             return commentList
@@ -131,7 +141,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
      * Fetch and store
      */
     private suspend fun fetchAndStore() {
-        errorMsg.postValue(null)
+        _errorMsg.value = null
 
         try {
             val api = api.value
@@ -149,7 +159,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
                     }
                 }
         } catch (e: Exception) {
-            errorMsg.postValue(e.message)
+            _errorMsg.value = e.message
             Timber.e(e)
         }
     }
