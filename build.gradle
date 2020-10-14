@@ -6,7 +6,7 @@ buildscript {
         serialization_version = "1.0.0"
         ktor_version = "1.4.1"
         junit_version = "4.13.1"
-        coroutines_version = "1.3.9"
+        coroutines_version = "1.4.0-M1"
         timber_version = "4.7.1"
     }
     repositories {
