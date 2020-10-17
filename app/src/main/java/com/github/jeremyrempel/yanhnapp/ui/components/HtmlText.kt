@@ -64,7 +64,7 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
                                     val href = node.attr("href")
 
                                     addStringAnnotation(
-                                        scope = "link",
+                                        tag = "link",
                                         start = start,
                                         end = end,
                                         annotation = href
