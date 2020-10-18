@@ -51,9 +51,9 @@ import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Date
-
-const val animationTime = 300
 
 @ExperimentalAnimationApi
 @ExperimentalLayout
@@ -71,7 +71,7 @@ fun CommentsScreen(post: Post) {
             Text("Error: ${error.value}")
         }
         data.value.isNotEmpty() -> {
-            CommentList(comments = data.value)
+            CommentList(comments = data.value, post)
         }
         else -> {
             Loading()
@@ -79,11 +79,47 @@ fun CommentsScreen(post: Post) {
     }
 }
 
+@Composable
+private fun CommentHeader(title: String, domain: String?, date: Long) {
+
+    val relativeDate =
+        remember(date) {
+            DateUtils.getRelativeTimeSpanString(
+                date * 1000,
+                Instant.now().toEpochMilli(),
+                0
+            ).toString()
+        }
+
+    Column(
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.h6
+        )
+
+        Row(
+            Modifier.fillMaxWidth().padding(end = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (domain != null) {
+                Text(text = domain, style = MaterialTheme.typography.body2)
+            }
+            Text(text = relativeDate, style = MaterialTheme.typography.body2)
+        }
+
+        Divider(modifier = Modifier.fillMaxWidth().padding(top = 15.dp))
+    }
+}
+
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun CommentList(comments: List<Comment>, modifier: Modifier = Modifier) {
+fun CommentList(comments: List<Comment>, post: Post, modifier: Modifier = Modifier) {
     ScrollableColumn {
+        CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
+
         comments.forEach { comment ->
             CommentTree(level = 0, comment = comment, modifier = modifier)
         }
@@ -150,7 +186,7 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
                     modifier = modifier.drawLayer(
                         scaleY = animate(
                             target = if (isExpanded) -1f else 1f,
-                            animSpec = TweenSpec(animationTime)
+                            animSpec = TweenSpec()
                         )
                     )
                 )
@@ -187,21 +223,21 @@ fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
         visible = showChildren.value,
         enter = slideInVertically(
             initialOffsetY = { -40 },
-            animSpec = TweenSpec(animationTime),
+            animSpec = TweenSpec(),
         ) + expandVertically(
             expandFrom = Alignment.Top,
-            animSpec = TweenSpec(animationTime),
+            animSpec = TweenSpec(),
         ) + fadeIn(
             initialAlpha = 0.3f,
-            animSpec = TweenSpec(animationTime),
+            animSpec = TweenSpec(),
         ),
         exit = slideOutVertically(
             targetOffsetY = { -40 },
-            animSpec = TweenSpec(animationTime),
+            animSpec = TweenSpec(),
         ) + shrinkVertically(
-            animSpec = TweenSpec(animationTime)
+            animSpec = TweenSpec()
         ) + fadeOut(
-            animSpec = TweenSpec(animationTime)
+            animSpec = TweenSpec()
         )
     ) {
         Column {
@@ -224,12 +260,24 @@ fun CommentLevelDivider(level: Int, modifier: Modifier) {
     Spacer(modifier = modifier.preferredWidth(15.dp))
 }
 
+@Preview(showBackground = true)
+@Composable
+fun CommentHeaderPreview() {
+    YetAnotherHNAppTheme {
+        CommentHeader(
+            "My Cool Post",
+            "cnn.com",
+            Instant.now().minus(1, ChronoUnit.HOURS).epochSecond
+        )
+    }
+}
+
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun CommentPreview() {
     YetAnotherHNAppTheme {
-        CommentList(comments = SampleData.commentList)
+        CommentList(comments = SampleData.commentList, SampleData.posts.first())
     }
 }
