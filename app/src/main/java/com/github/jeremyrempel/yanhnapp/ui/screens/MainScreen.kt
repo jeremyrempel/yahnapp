@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Icon
@@ -43,6 +44,7 @@ fun MainScreen() {
                         }
                     },
                     showUp = false,
+                    title = R.string.top_stories_title,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
@@ -50,6 +52,7 @@ fun MainScreen() {
                 ScaffoldWithContent(
                     content = { CommentsScreen(post = screen.post) },
                     showUp = true,
+                    title = R.string.comments_title,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
@@ -57,6 +60,7 @@ fun MainScreen() {
                 ScaffoldWithContent(
                     content = { ViewOne((currentScreen.value as Screen.ViewOne).post) },
                     showUp = true,
+                    title = R.string.app_name,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }
@@ -65,13 +69,18 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpaction: () -> Unit) {
+fun ScaffoldWithContent(
+    content: @Composable () -> Unit,
+    showUp: Boolean,
+    @StringRes title: Int,
+    onUpaction: () -> Unit
+) {
 
     if (showUp) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.app_name)) },
+                    title = { Text(stringResource(title)) },
                     navigationIcon = {
                         IconButton(onClick = { onUpaction() }) {
                             Icon(Icons.Filled.ArrowBack)
@@ -89,7 +98,7 @@ fun ScaffoldWithContent(content: @Composable () -> Unit, showUp: Boolean, onUpac
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.app_name)) },
+                    title = { Text(stringResource(title)) },
                 )
             },
             bodyContent = { content() }
