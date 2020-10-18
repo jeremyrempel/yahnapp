@@ -117,7 +117,13 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         val item = this
 
         val domain = if (item.url != null) {
-            URL(item.url).toURI().authority.replaceFirst("www.", "")
+
+            // malformed url. such as https:///mydomain.com just print it as is
+            if (URL(item.url).toURI().authority == null) {
+                item.url
+            } else {
+                URL(item.url).toURI().authority.replaceFirst("www.", "")
+            }
         } else {
             null
         }
