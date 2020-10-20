@@ -1,6 +1,5 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
-import android.webkit.WebViewClient
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
