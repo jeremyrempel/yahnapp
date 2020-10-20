@@ -55,16 +55,7 @@ fun ViewOne(post: Post) {
 
 @Composable
 fun ViewOneContent(url: String?, text: String?) {
-    val ctx = remember { WebContext() }
-    val client = remember { WebViewClient() }
-
-    if (text != null) {
-        Text(text = text)
-    }
-
-    if (url != null) {
-        WebComponent(url = url, webViewClient = client, webContext = ctx)
-    }
+    Text(text ?: "")
 }
 
 @ExperimentalAnimationApi
