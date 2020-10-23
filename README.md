@@ -1,6 +1,6 @@
 # Yet another Hacker News app (YAHN App)
 
-Yet another Hacker News App is an Android app built using [Jetpack Compose](https://developer.android.com/jetpack/compose). Focus is on privacy, simplicity and performance. YAHN is free as in freedom and always free from advertisements and trackers.
+Yet another Hacker News App is an Android app built using [Jetpack Compose](https://developer.android.com/jetpack/compose). Focus is on privacy, simplicity and performance. YAHN is free as in freedom and always free from advertisements and trackers. YAHN can be downloaded from the [Google Play](https://play.google.com/store/apps/details?id=com.github.jeremyrempel.yanhnapp) store.
 
 ## Why
 
