@@ -15,6 +15,8 @@ object SampleData {
             2,
             9,
             0,
+            0,
+            0,
             0
         ),
         Post(
@@ -26,6 +28,8 @@ object SampleData {
             1000,
             5,
             1000,
+            1,
+            1,
             0,
             0
         ),
@@ -38,6 +42,8 @@ object SampleData {
             100,
             1,
             50,
+            1,
+            0,
             0,
             0
         ),
@@ -51,6 +57,8 @@ object SampleData {
             1,
             50,
             0,
+            0,
+            0,
             0
         ),
         Post(
@@ -63,6 +71,8 @@ object SampleData {
             10,
             100,
             0,
+            1,
+            0,
             0
         ),
         Post(
@@ -74,6 +84,8 @@ object SampleData {
             200,
             5,
             25,
+            0,
+            0,
             0,
             0
         )

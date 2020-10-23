@@ -36,7 +36,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
 
     private var currentPost: Long = -1
 
-    private val db = lazy { HackerNewsDb(application) }
+    private val db by lazy { HackerNewsDb(application) }
     private val api = lazy { HackerNewsApi(networkDebug = Timber::d) }
 
     fun requestPosts() {
@@ -48,7 +48,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
 
             // todo is there a better way to wire this together?
             async {
-                db.value.selectAllPostsByRank()
+                db.selectAllPostsByRank()
                     .collectLatest {
                         // don't update ui on every update
                         delay(100)
@@ -139,7 +139,9 @@ class MyVm(application: Application) : AndroidViewModel(application) {
             unixTime = item.time,
             commentsCnt = item.descendants?.toLong() ?: 0,
             now,
-            now
+            now,
+            Instant.now().epochSecond,
+            Instant.now().epochSecond
         )
     }
 
@@ -155,13 +157,13 @@ class MyVm(application: Application) : AndroidViewModel(application) {
             api.fetchTopItems()
                 .map { it.toLong() }
                 .also { topItems ->
-                    db.value.replaceTopPosts(topItems)
+                    db.replaceTopPosts(topItems)
 
                     topItems.map { itemId ->
                         api
                             .fetchItem(itemId)
                             .toPost()
-                            .also { p -> db.value.store(p) }
+                            .also { p -> db.store(p) }
                     }
                 }
         } catch (e: Exception) {
@@ -170,9 +172,25 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun markPostViewed(id: Long) {
+        viewModelScope.launch {
+            async(Dispatchers.IO) {
+                db.markPostAsRead(id)
+            }
+        }
+    }
+
+    fun markPostCommentViewed(id: Long) {
+        viewModelScope.launch {
+            async(Dispatchers.IO) {
+                db.markCommentRead(id)
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
 
-        if (db.isInitialized()) db.value.close()
+        db.close()
     }
 }

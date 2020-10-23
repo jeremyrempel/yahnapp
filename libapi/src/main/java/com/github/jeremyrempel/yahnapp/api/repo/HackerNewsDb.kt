@@ -24,21 +24,25 @@ class HackerNewsDb(
     }
 
     suspend fun store(post: Post) = coroutineScope {
-        database.postQueries.insert(
-            post.id,
-            post.title,
-            post.text,
-            post.domain,
-            post.url,
-            post.points,
-            post.unixTime,
-            post.commentsCnt
-        )
-    }
+        val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
 
-    suspend fun selectPostById(id: Long): Post? = coroutineScope {
-        withContext(Dispatchers.IO) {
-            database.postQueries.selectPostById(id).executeAsOneOrNull()
+        if (postDb != null) {
+            database.postQueries.update(
+                post.points,
+                post.commentsCnt,
+                post.id
+            )
+        } else {
+            database.postQueries.insert(
+                post.id,
+                post.title,
+                post.text,
+                post.domain,
+                post.url,
+                post.points,
+                post.unixTime,
+                post.commentsCnt
+            )
         }
     }
 
@@ -51,6 +55,14 @@ class HackerNewsDb(
         topPosts.forEachIndexed { rank, postId ->
             database.postQueries.insertTopPost(postId, rank.toLong())
         }
+    }
+
+    suspend fun markPostAsRead(id: Long) = coroutineScope {
+        database.postQueries.markPostAsViewed(id)
+    }
+
+    suspend fun markCommentRead(id: Long) = coroutineScope {
+        database.postQueries.markPostCommentAsViewed(id)
     }
 
     suspend fun getPref(key: String): Pref? = coroutineScope {
