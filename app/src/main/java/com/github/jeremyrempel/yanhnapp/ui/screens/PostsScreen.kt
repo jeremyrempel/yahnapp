@@ -20,6 +20,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
@@ -58,6 +60,8 @@ fun ListContent(
             data = posts,
             scrollState,
             onSelectPost = { post ->
+                vm.markPostViewed(post.id)
+
                 val url = post.url
                 if (url != null) {
                     launchBrowser(url, context)
@@ -66,6 +70,7 @@ fun ListContent(
                 }
             },
             onSelectPostComment = { post ->
+                vm.markPostCommentViewed(post.id)
                 navigateTo(Screen.ViewComments(post))
             }
         )
@@ -111,9 +116,11 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                     .padding(end = 10.dp)
                     .clickable(onClick = { onSelectPost(post) }),
             ) {
+
                 Text(
                     text = post.title,
-                    style = MaterialTheme.typography.h6
+                    style = MaterialTheme.typography.h6,
+                    color = if (post.hasViewedPost == 1L) Color.Gray else MaterialTheme.colors.onBackground
                 )
 
                 Row(
@@ -143,14 +150,22 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                         onClick = { onSelectPostComment(post) }
                     ),
             ) {
+
+                val imgCommentMod = if (post.hasViewedComments == 1L) {
+                    Modifier.align(Alignment.CenterHorizontally).drawOpacity(0.5f)
+                } else {
+                    Modifier.align(Alignment.CenterHorizontally)
+                }
+
                 Image(
                     asset = vectorResource(id = R.drawable.ic_baseline_comment_24),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = imgCommentMod
                 )
                 Text(
                     text = post.commentsCnt.toString(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = if (post.hasViewedPost == 1L) Color.Gray else MaterialTheme.colors.onBackground
                 )
             }
         }
