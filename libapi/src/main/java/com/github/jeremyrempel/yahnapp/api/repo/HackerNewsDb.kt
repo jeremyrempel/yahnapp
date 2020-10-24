@@ -47,13 +47,13 @@ class HackerNewsDb(
     }
 
     suspend fun selectAllPostsByRank(): Flow<List<Post>> = coroutineScope {
-        database.postQueries.selectPostsByRank().asFlow().mapToList()
+        database.topPostsQueries.selectPostsByRank().asFlow().mapToList()
     }
 
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
-        database.postQueries.truncateTopPosts()
+        database.topPostsQueries.truncateTopPosts()
         topPosts.forEachIndexed { rank, postId ->
-            database.postQueries.insertTopPost(postId, rank.toLong())
+            database.topPostsQueries.insertTopPost(postId, rank.toLong())
         }
     }
 

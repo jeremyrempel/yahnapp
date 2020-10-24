@@ -23,26 +23,6 @@ UPDATE post SET points = ?, commentsCnt = ?, lastUpdated = date('now') WHERE id 
 selectPostById:
 SELECT * FROM post WHERE id = ?;
 
-selectPostsByRank:
-SELECT
-    post.*
-FROM
-    top_posts
-JOIN
-    post ON top_posts.id = post.id
-ORDER BY top_posts.rank ASC;
-
-CREATE TABLE top_posts (
-    id INTEGER NOT NULL PRIMARY KEY,
-    rank INTEGER UNIQUE NOT NULL
-);
-
-truncateTopPosts:
-DELETE FROM top_posts;
-
-insertTopPost:
-INSERT INTO top_posts (id, rank) VALUES (?, ?);
-
 markPostAsViewed:
 UPDATE post SET hasViewedPost = 1, lastUpdated = date('now') WHERE id = ?;
 

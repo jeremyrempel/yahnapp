@@ -1,0 +1,19 @@
+CREATE TABLE top_posts (
+    id INTEGER NOT NULL PRIMARY KEY,
+    rank INTEGER UNIQUE NOT NULL
+);
+
+selectPostsByRank:
+SELECT
+    post.*
+FROM
+    top_posts
+JOIN
+    post ON top_posts.id = post.id
+ORDER BY top_posts.rank ASC;
+
+truncateTopPosts:
+DELETE FROM top_posts;
+
+insertTopPost:
+INSERT INTO top_posts (id, rank) VALUES (?, ?);
