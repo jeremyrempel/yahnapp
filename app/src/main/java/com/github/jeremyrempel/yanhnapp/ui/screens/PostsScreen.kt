@@ -165,7 +165,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                 Text(
                     text = post.commentsCnt.toString(),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = if (post.hasViewedPost == 1L) Color.Gray else MaterialTheme.colors.onBackground
+                    color = if (post.hasViewedComments == 1L) Color.Gray else MaterialTheme.colors.onBackground
                 )
             }
         }
