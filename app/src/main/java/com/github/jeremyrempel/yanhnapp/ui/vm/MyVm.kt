@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
-import com.github.jeremyrempel.yahnapp.api.model.Comment
+import com.github.jeremyrempel.yahnapp.api.di.NetworkModule
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.IOException
 import java.net.URL
 import java.time.Instant
 
@@ -28,18 +27,15 @@ class MyVm(application: Application) : AndroidViewModel(application) {
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts.asStateFlow()
 
-    private val _comments = MutableStateFlow<List<Comment>>(emptyList())
-    val comments = _comments.asStateFlow()
-
     private val _errorMsg = MutableStateFlow<String?>(null)
     val errorMsg = _errorMsg.asStateFlow()
 
-    private var currentPost: Long = -1
+    // todo daggerify and extract out
+    val db by lazy { HackerNewsDb(application) }
+    val api: HackerNewsApi by lazy { NetworkModule.providesApi(application) }
 
-    private val db by lazy { HackerNewsDb(application) }
-    private val api = lazy { HackerNewsApi(networkDebug = Timber::d) }
-
-    fun requestPosts() {
+    @Suppress("DeferredResultUnused")
+    fun requestAndStorePosts() {
         viewModelScope.launch {
 
             async(Dispatchers.IO) {
@@ -58,59 +54,6 @@ class MyVm(application: Application) : AndroidViewModel(application) {
                     }
             }
         }
-    }
-
-    fun requestComments(id: Long) {
-        if (currentPost != id) {
-            currentPost = id
-            _comments.value = emptyList()
-
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    _errorMsg.value = null
-                    val result = fetchCommentsForPost(id)
-                    _comments.value = result
-                } catch (e: IOException) {
-                    _errorMsg.value = e.message
-                    Timber.e(e)
-                }
-            }
-        }
-    }
-
-    /**
-     * Given list of trees, fetch all leafs and metadata
-     */
-    private suspend fun fetchCommentsForPost(postId: Long): List<Comment> {
-        val api = api.value
-
-        // dfs
-        suspend fun getCommentsByIds(commentIds: List<Long>, level: Int = 1): List<Comment> {
-            val commentList = commentIds
-                .map {
-                    val item = api.fetchItem(it)
-
-                    // recurse
-                    val commentChildren = getCommentsByIds(item.kids ?: listOf(), level + 1)
-                    Comment(
-                        item.by ?: "",
-                        item.time * 1000,
-                        item.text ?: "",
-                        commentChildren
-                    )
-                }
-
-            if (level == 1) {
-                _comments.value = commentList
-            }
-
-            return commentList
-        }
-
-        val kids = (api.fetchItem(postId).kids ?: emptyList())
-
-        // dfs start
-        return getCommentsByIds(kids)
     }
 
     private fun Item.toPost(): Post {
@@ -152,13 +95,10 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         _errorMsg.value = null
 
         try {
-            val api = api.value
-
             api.fetchTopItems()
                 .map { it.toLong() }
                 .also { topItems ->
                     db.replaceTopPosts(topItems)
-
                     topItems.map { itemId ->
                         api
                             .fetchItem(itemId)
@@ -172,6 +112,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    @Suppress("DeferredResultUnused")
     fun markPostViewed(id: Long) {
         viewModelScope.launch {
             async(Dispatchers.IO) {
@@ -180,6 +121,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    @Suppress("DeferredResultUnused")
     fun markPostCommentViewed(id: Long) {
         viewModelScope.launch {
             async(Dispatchers.IO) {

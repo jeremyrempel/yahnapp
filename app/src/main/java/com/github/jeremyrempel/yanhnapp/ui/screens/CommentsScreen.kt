@@ -12,7 +12,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,13 +24,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.lazy.ExperimentalLazyDsl
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
@@ -40,48 +43,178 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
+import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.model.Comment
+import com.github.jeremyrempel.yahnapp.api.Lce
+import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
-import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.Date
 
+@ExperimentalLazyDsl
+@ExperimentalCoroutinesApi
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun CommentsScreen(post: Post) {
+fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
-    val vm = viewModel<MyVm>()
-    vm.requestComments(post.id)
+    var state by remember { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
 
-    val data = vm.comments.collectAsState()
-    val error = vm.errorMsg.collectAsState()
-
-    when {
-        !error.value.isNullOrEmpty() -> {
-            Text("Error: ${error.value}")
+    LaunchedTask(post.id) {
+        async(Dispatchers.IO) {
+            try {
+                useCase.requestAndStoreComments(post.id)
+            } catch (e: Exception) {
+                state = Lce.Error(e.localizedMessage ?: "")
+            }
         }
-        data.value.isNotEmpty() -> {
-            CommentList(comments = data.value, post)
+
+        useCase.getCommentsForPost(post.id).collectLatest {
+            state = Lce.Content(it)
         }
-        else -> {
-            Loading()
+    }
+
+    when (state) {
+        is Lce.Loading -> Loading()
+        is Lce.Error -> Text("Error: $state")
+        is Lce.Content -> {
+            val content = (state as Lce.Content<List<Comment>>)
+            CommentList(comments = content.data, post, useCase)
+        }
+    }
+}
+
+@ExperimentalLazyDsl
+@ExperimentalAnimationApi
+@ExperimentalLayout
+@Composable
+fun CommentList(
+    comments: List<Comment>,
+    post: Post,
+    useCase: CommentsUseCase
+) {
+
+    LazyColumn(
+        content = {
+            item {
+                CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
+
+                comments.forEach { comment ->
+                    CommentTree(level = 0, comment = comment, useCase)
+                }
+            }
+        }
+    )
+}
+
+@ExperimentalLayout
+@ExperimentalAnimationApi
+@Composable
+fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
+
+    var showChildren by remember { mutableStateOf(true) }
+    var children by remember(comment.id) { mutableStateOf(emptyList<Comment>()) }
+
+    LaunchedTask(comment.id) {
+        launch {
+            useCase.getCommentsForParent(comment.id).collectLatest {
+                children = it
+            }
+        }
+    }
+
+    Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
+        CommentLevelDivider(level = level)
+
+        Column {
+            Spacer(modifier = Modifier.preferredHeight(15.dp).fillMaxWidth())
+
+            SingleComment(comment = comment)
+            CommentHasMore(
+                count = comment.childrenCnt,
+                isExpanded = showChildren
+            ) {
+                showChildren = !showChildren
+            }
+        }
+    }
+
+    AnimatedVisibility(
+        visible = showChildren,
+        enter = slideInVertically(
+            initialOffsetY = { -40 },
+            animSpec = TweenSpec(),
+        ) + expandVertically(
+            expandFrom = Alignment.Top,
+            animSpec = TweenSpec(),
+        ) + fadeIn(
+            initialAlpha = 0.3f,
+            animSpec = TweenSpec(),
+        ),
+        exit = slideOutVertically(
+            targetOffsetY = { -40 },
+            animSpec = TweenSpec(),
+        ) + shrinkVertically(
+            animSpec = TweenSpec()
+        ) + fadeOut(
+            animSpec = TweenSpec()
+        )
+    ) {
+        Column {
+            children.forEach { c ->
+                CommentTree(level = level + 1, comment = c, useCase = useCase)
+            }
+        }
+    }
+}
+
+@Composable
+fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
+
+    val timeRelative = remember(comment.unixTime) {
+        DateUtils
+            .getRelativeTimeSpanString(comment.unixTime, Instant.now().epochSecond, 0)
+            .toString()
+    }
+
+    val context = ContextAmbient.current
+
+    Column(
+        modifier = modifier.padding(end = 10.dp)
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = comment.username,
+                style = MaterialTheme.typography.subtitle1,
+                modifier = modifier.padding(end = 10.dp)
+            )
+            Text(
+                text = timeRelative,
+                style = MaterialTheme.typography.subtitle1
+            )
+        }
+        HtmlText(html = comment.content) { url ->
+            launchBrowser(url, context)
         }
     }
 }
 
 @Composable
 private fun CommentHeader(title: String, domain: String?, date: Long) {
-
     val relativeDate =
         remember(date) {
             DateUtils.getRelativeTimeSpanString(
@@ -113,55 +246,8 @@ private fun CommentHeader(title: String, domain: String?, date: Long) {
     }
 }
 
-@ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
-fun CommentList(comments: List<Comment>, post: Post, modifier: Modifier = Modifier) {
-    ScrollableColumn {
-        CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
-
-        comments.forEach { comment ->
-            CommentTree(level = 0, comment = comment, modifier = modifier)
-        }
-    }
-}
-
-@Composable
-fun SingleComment(comment: Comment, modifier: Modifier) {
-
-    val timeRelative = remember(comment.unixTimeMs) {
-        DateUtils
-            .getRelativeTimeSpanString(comment.unixTimeMs, Date().time, 0)
-            .toString()
-    }
-
-    val context = ContextAmbient.current
-
-    Column(
-        modifier = modifier.padding(end = 10.dp)
-    ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = comment.userName,
-                style = MaterialTheme.typography.subtitle1,
-                modifier = modifier.padding(end = 10.dp)
-            )
-            Text(
-                text = timeRelative,
-                style = MaterialTheme.typography.subtitle1
-            )
-        }
-        HtmlText(html = comment.content) { url ->
-            launchBrowser(url, context)
-        }
-    }
-}
-
-@Composable
-fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick: () -> Unit) {
+fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -171,19 +257,18 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
             TextButton(
                 onClick = onClick
             ) {
-
                 Text(
                     text = count.toString(),
                     color = Color.Gray,
                     style = MaterialTheme.typography.subtitle1,
-                    modifier = modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
                 Image(
                     asset = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
                     colorFilter = ColorFilter.tint(Color.Gray),
                     // app crashes on alternate
-                    modifier = modifier.drawLayer(
+                    modifier = Modifier.drawLayer(
                         scaleY = animate(
                             target = if (isExpanded) -1f else 1f,
                             animSpec = TweenSpec()
@@ -195,61 +280,8 @@ fun CommentHasMore(count: Int, isExpanded: Boolean, modifier: Modifier, onClick:
     }
 }
 
-@ExperimentalLayout
-@ExperimentalAnimationApi
 @Composable
-fun CommentTree(level: Int, comment: Comment, modifier: Modifier) {
-
-    val showChildren = remember { mutableStateOf(true) }
-
-    Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
-        CommentLevelDivider(level = level, modifier = modifier)
-
-        Column {
-            Spacer(modifier = Modifier.preferredHeight(15.dp).fillMaxWidth())
-
-            SingleComment(comment = comment, modifier)
-            CommentHasMore(
-                count = comment.children.size,
-                isExpanded = showChildren.value,
-                modifier
-            ) {
-                showChildren.value = !showChildren.value
-            }
-        }
-    }
-
-    AnimatedVisibility(
-        visible = showChildren.value,
-        enter = slideInVertically(
-            initialOffsetY = { -40 },
-            animSpec = TweenSpec(),
-        ) + expandVertically(
-            expandFrom = Alignment.Top,
-            animSpec = TweenSpec(),
-        ) + fadeIn(
-            initialAlpha = 0.3f,
-            animSpec = TweenSpec(),
-        ),
-        exit = slideOutVertically(
-            targetOffsetY = { -40 },
-            animSpec = TweenSpec(),
-        ) + shrinkVertically(
-            animSpec = TweenSpec()
-        ) + fadeOut(
-            animSpec = TweenSpec()
-        )
-    ) {
-        Column {
-            comment.children.forEach { c ->
-                CommentTree(level = level + 1, comment = c, modifier = modifier)
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentLevelDivider(level: Int, modifier: Modifier) {
+fun CommentLevelDivider(level: Int, modifier: Modifier = Modifier) {
     for (i in 0 until level) {
         Spacer(modifier = modifier.preferredWidth(10.dp))
         Divider(
@@ -258,6 +290,14 @@ fun CommentLevelDivider(level: Int, modifier: Modifier) {
         )
     }
     Spacer(modifier = modifier.preferredWidth(15.dp))
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommentHasMorePreview() {
+    var expanded by remember { mutableStateOf(true) }
+
+    CommentHasMore(count = 1, isExpanded = expanded, onClick = { expanded = !expanded })
 }
 
 @Preview(showBackground = true)
@@ -272,12 +312,19 @@ fun CommentHeaderPreview() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun SingleCommentPreview() {
+    SingleComment(comment = SampleData.commentList.first())
+}
+
+@ExperimentalLazyDsl
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun CommentPreview() {
     YetAnotherHNAppTheme {
-        CommentList(comments = SampleData.commentList, SampleData.posts.first())
+        // CommentList(comments = SampleData.commentList, SampleData.posts.first())
     }
 }

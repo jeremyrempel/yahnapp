@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.ExperimentalLayout
+import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -16,9 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.viewModel
 import com.github.jeremyrempel.yahn.Post
+import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
+import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 
 sealed class Screen {
     data class List(val isLoading: Boolean = false) : Screen()
@@ -26,6 +30,7 @@ sealed class Screen {
     data class ViewComments(val post: Post) : Screen()
 }
 
+@ExperimentalLazyDsl
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
@@ -49,8 +54,16 @@ fun MainScreen() {
                 )
             }
             is Screen.ViewComments -> {
+
+                // todo pass in
+                val vm = viewModel<MyVm>()
+                val commentUseCase = CommentsUseCase(
+                    db = vm.db,
+                    api = vm.api
+                )
+
                 ScaffoldWithContent(
-                    content = { CommentsScreen(post = screen.post) },
+                    content = { CommentsScreen(post = screen.post, commentUseCase) },
                     showUp = true,
                     title = R.string.comments_title,
                     onUpaction = { currentScreen.value = Screen.List() }

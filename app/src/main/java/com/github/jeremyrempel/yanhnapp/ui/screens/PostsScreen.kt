@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawOpacity
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
@@ -92,8 +91,11 @@ fun PostsList(
     }
 }
 
+@ExperimentalCoroutinesApi
 @Composable
 fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
+
+    val readOpacity = 0.4f
 
     val relativeDate =
         remember(post) {
@@ -120,7 +122,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                 Text(
                     text = post.title,
                     style = MaterialTheme.typography.h6,
-                    color = if (post.hasViewedPost == 1L) Color.Gray else MaterialTheme.colors.onBackground
+                    modifier = if (post.hasViewedPost == 1L) Modifier.drawOpacity(readOpacity) else Modifier
                 )
 
                 Row(
@@ -147,12 +149,14 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                     .weight(0.1f)
                     .align(Alignment.CenterVertically)
                     .clickable(
-                        onClick = { onSelectPostComment(post) }
+                        onClick = {
+                            onSelectPostComment(post)
+                        }
                     ),
             ) {
 
                 val imgCommentMod = if (post.hasViewedComments == 1L) {
-                    Modifier.align(Alignment.CenterHorizontally).drawOpacity(0.5f)
+                    Modifier.align(Alignment.CenterHorizontally).drawOpacity(readOpacity)
                 } else {
                     Modifier.align(Alignment.CenterHorizontally)
                 }
@@ -164,8 +168,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                 )
                 Text(
                     text = post.commentsCnt.toString(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = if (post.hasViewedComments == 1L) Color.Gray else MaterialTheme.colors.onBackground
+                    modifier = imgCommentMod
                 )
             }
         }

@@ -61,7 +61,7 @@ fun ViewOneContent(url: String?, text: String?) {
 @ExperimentalLayout
 @Composable
 fun ViewOneComments() {
-    CommentPreview()
+    // CommentPreview()
 }
 
 @ExperimentalAnimationApi
