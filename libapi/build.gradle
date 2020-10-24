@@ -16,6 +16,12 @@ java {
     targetCompatibility JavaVersion.VERSION_1_8
 }
 
+sqldelight {
+    Database {
+        schemaOutputDirectory = file("src/main/sqldelight/databases")
+    }
+}
+
 dependencies {
     // network
     api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
