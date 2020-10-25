@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.material.Divider
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -47,12 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.Lce
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
-import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -69,34 +68,47 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
-    var state by remember { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
+    var data by remember { mutableStateOf<List<Comment>>(emptyList()) }
+    var loadProgress by remember { mutableStateOf(0.0f) }
+
+    var errorMsgVisible by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedTask(post.id) {
         useCase.getCommentsForPost(post.id).collectLatest {
-            state = try {
-                Lce.Content(it)
-            } catch (e: java.lang.Exception) {
-                Timber.e(e)
-                Lce.Error(e.localizedMessage ?: "")
-            }
+            data = it
         }
     }
 
     LaunchedTask(post.id) {
         try {
-            useCase.requestAndStoreComments(post.id)
+            useCase.requestAndStoreComments(post.id) {
+                loadProgress = it
+            }
         } catch (e: Exception) {
             Timber.e(e)
+            error = e.localizedMessage
+            errorMsgVisible = true
         }
     }
 
-    when (state) {
-        is Lce.Loading -> Loading()
-        is Lce.Error -> Text("Error: $state")
-        is Lce.Content -> {
-            val content = (state as Lce.Content<List<Comment>>)
-            CommentList(comments = content.data, post, useCase)
+    Column {
+        if (error != null && errorMsgVisible) {
+            val errorTxt = error!!
+            Text(errorTxt)
+            TextButton(onClick = { errorMsgVisible = false }) {
+                Text("Dismiss")
+            }
         }
+
+        if (loadProgress < 100) {
+            LinearProgressIndicator(
+                loadProgress,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        CommentList(comments = data, post, useCase)
     }
 }
 

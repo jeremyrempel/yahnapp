@@ -7,19 +7,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class CommentsUseCase(
     private val db: HackerNewsDb,
     private val api: HackerNewsApi
 ) {
 
-    @Suppress("DeferredResultUnused")
-    suspend fun requestAndStoreComments(postId: Long) = coroutineScope {
-        val kids = (api.fetchItem(postId).kids ?: emptyList())
-        getCommentsByIds(kids, postId)
-    }
-
-    @Suppress("DeferredResultUnused")
     suspend fun getCommentsForPost(postId: Long): Flow<List<Comment>> {
         return db.selectCommentsByPost(postId)
     }
@@ -28,7 +22,31 @@ class CommentsUseCase(
         return db.selectCommentsByParent(parentCommentId)
     }
 
-    private suspend fun getCommentsByIds(commentIds: List<Long>, postId: Long, level: Int = 1) {
+    suspend fun requestAndStoreComments(postId: Long, progressUpdate: (Float) -> Unit) {
+        coroutineScope {
+            withContext(Dispatchers.IO) {
+                val kids = (api.fetchItem(postId).kids ?: emptyList())
+
+                val total = kids.size.toFloat()
+                var currentLoad = 1
+
+                getCommentsByIds(kids, postId) {
+                    currentLoad++
+                    val update = currentLoad / total
+                    progressUpdate(update)
+                }
+
+                progressUpdate(100f)
+            }
+        }
+    }
+
+    private suspend fun getCommentsByIds(
+        commentIds: List<Long>,
+        postId: Long,
+        level: Int = 1,
+        onBranchCompleted: () -> Unit,
+    ) {
         coroutineScope {
             var cnt = 0
 
@@ -55,7 +73,11 @@ class CommentsUseCase(
 
                     cnt++
 
-                    getCommentsByIds(item.kids ?: listOf(), postId, level + 1)
+                    getCommentsByIds(item.kids ?: listOf(), postId, level + 1, onBranchCompleted)
+
+                    if (level == 1) {
+                        onBranchCompleted()
+                    }
                 }
         }
     }
