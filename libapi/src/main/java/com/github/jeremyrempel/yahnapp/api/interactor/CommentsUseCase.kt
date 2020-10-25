@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 class CommentsUseCase(
     private val db: HackerNewsDb,
@@ -43,18 +42,17 @@ class CommentsUseCase(
                     it.await()
                 }
                 .forEach { item ->
-                    withContext(Dispatchers.Default) {
-                        db.insertComment(
-                            id = item.id.toLong(),
-                            username = item.by ?: "n/a",
-                            unixTime = item.time,
-                            content = item.text ?: "",
-                            postId = postId,
-                            parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
-                            childrenCnt = item.kids?.size?.toLong() ?: 0,
-                            order = cnt.toLong()
-                        )
-                    }
+                    db.storePost(
+                        id = item.id.toLong(),
+                        username = item.by ?: "n/a",
+                        unixTime = item.time,
+                        content = item.text ?: "",
+                        postId = postId,
+                        parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
+                        childrenCnt = item.kids?.size?.toLong() ?: 0,
+                        order = cnt.toLong()
+                    )
+
                     cnt++
 
                     getCommentsByIds(item.kids ?: listOf(), postId, level + 1)

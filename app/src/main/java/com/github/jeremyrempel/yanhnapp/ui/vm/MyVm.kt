@@ -103,7 +103,7 @@ class MyVm(application: Application) : AndroidViewModel(application) {
                         api
                             .fetchItem(itemId)
                             .toPost()
-                            .also { p -> db.store(p) }
+                            .also { p -> db.storePost(p) }
                     }
                 }
         } catch (e: Exception) {

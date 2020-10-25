@@ -17,8 +17,14 @@ insert:
 INSERT OR REPLACE INTO comment (id, username, unixTime, content, postid, parent, childrenCnt, sortorder, lastUpdated, created)
 VALUES (?,?,?,?,?,?,?,?,date('now'),date('now'));
 
+updateChildrenContent:
+UPDATE comment SET content = ?, childrenCnt = ? WHERE id = ?;
+
 selectCommentsByPost:
 SELECT * FROM comment WHERE parent IS NULL AND postid = ? ORDER BY sortorder ASC;
 
 selectCommentsByParent:
 SELECT * FROM comment WHERE parent = ? ORDER BY sortorder ASC;
+
+selectById:
+SELECT * FROM comment WHERE id = ?;

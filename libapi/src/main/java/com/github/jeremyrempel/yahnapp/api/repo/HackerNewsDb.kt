@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class HackerNewsDb(
     context: Application
@@ -24,15 +25,18 @@ class HackerNewsDb(
         Database(driver)
     }
 
-    suspend fun store(post: Post) = coroutineScope {
+    suspend fun storePost(post: Post) = coroutineScope {
         val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
 
         if (postDb != null) {
-            database.postQueries.update(
-                post.points,
-                post.commentsCnt,
-                post.id
-            )
+            // only update post if something we care about has changed
+            if (postDb.points != post.points || postDb.commentsCnt != post.commentsCnt) {
+                database.postQueries.update(
+                    post.points,
+                    post.commentsCnt,
+                    post.id
+                )
+            }
         } else {
             database.postQueries.insert(
                 post.id,
@@ -74,7 +78,7 @@ class HackerNewsDb(
         database.commentQueries.selectCommentsByParent(id).asFlow().mapToList()
     }
 
-    suspend fun insertComment(
+    suspend fun storePost(
         id: Long,
         username: String,
         unixTime: Long,
@@ -84,16 +88,36 @@ class HackerNewsDb(
         childrenCnt: Long,
         order: Long
     ) = coroutineScope {
-        database.commentQueries.insert(
-            id = id,
-            username = username,
-            unixTime = unixTime,
-            content = content,
-            postid = postId,
-            parent = parent,
-            childrenCnt = childrenCnt,
-            sortorder = order
-        )
+        withContext(Dispatchers.Default) {
+
+            val commentDb = database.commentQueries.selectById(id).executeAsOneOrNull()
+
+            if (commentDb != null) {
+                // incremental update
+                if (childrenCnt != commentDb.childrenCnt || content != commentDb.content) {
+                    Timber.v("Cache miss, updating comment: $id, $username, $content, $childrenCnt")
+                    database.commentQueries.updateChildrenContent(
+                        content,
+                        childrenCnt,
+                        id
+                    )
+                } else {
+                    Timber.v("Cache hit, not updating comment: $id")
+                }
+            } else {
+                Timber.v("Cache miss, inserting new comment: $id, $username, $content")
+                database.commentQueries.insert(
+                    id = id,
+                    username = username,
+                    unixTime = unixTime,
+                    content = content,
+                    postid = postId,
+                    parent = parent,
+                    childrenCnt = childrenCnt,
+                    sortorder = order
+                )
+            }
+        }
     }
 
     suspend fun getPref(key: String): Pref? = coroutineScope {

@@ -25,7 +25,7 @@ object NetworkModule {
         return Cache(ctx.cacheDir, CACHE_SIZE)
     }
 
-    private fun providesClient(cache: Cache, networkDebug: (String) -> Unit): HttpClient {
+    private fun providesClient(cache: Cache): HttpClient {
         return HttpClient(OkHttp) {
             engine {
                 config {
@@ -46,7 +46,7 @@ object NetworkModule {
             install(Logging) {
                 logger = object : Logger {
                     override fun log(message: String) {
-                        networkDebug("Network: $message")
+                        Timber.v("network: $message")
                     }
                 }
 
@@ -58,7 +58,7 @@ object NetworkModule {
     fun providesApi(context: Context): HackerNewsApi {
         val cache = provideCache(context)
 
-        val client = providesClient(cache, Timber::d)
+        val client = providesClient(cache)
         return HackerNewsApi(client = client)
     }
 }
