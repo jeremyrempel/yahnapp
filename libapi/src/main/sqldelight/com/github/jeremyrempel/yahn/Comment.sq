@@ -7,7 +7,6 @@ CREATE TABLE comment (
      parent INTEGER,
      childrenCnt INTEGER NOT NULL,
      sortorder INTEGER NOT NULL,
-     childrenVisible INTEGER NOT NULL DEFAULT 1,
      lastUpdated INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
      created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
      FOREIGN KEY(parent) REFERENCES comment(id) ON DELETE CASCADE,

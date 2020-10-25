@@ -12,6 +12,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
@@ -95,7 +95,6 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
     }
 }
 
-@ExperimentalLazyDsl
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
@@ -105,17 +104,13 @@ fun CommentList(
     useCase: CommentsUseCase
 ) {
 
-    LazyColumn(
-        content = {
-            item {
-                CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
+    ScrollableColumn {
+        CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
 
-                comments.forEach { comment ->
-                    CommentTree(level = 0, comment = comment, useCase)
-                }
-            }
+        comments.forEach { comment ->
+            CommentTree(level = 0, comment = comment, useCase)
         }
-    )
+    }
 }
 
 @ExperimentalLayout
@@ -123,7 +118,7 @@ fun CommentList(
 @Composable
 fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
 
-    var showChildren by remember { mutableStateOf(true) }
+    var showChildren by remember(comment.id) { mutableStateOf(true) }
     var children by remember(comment.id) { mutableStateOf(emptyList<Comment>()) }
 
     LaunchedTask(comment.id) {
@@ -171,9 +166,11 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
             animSpec = TweenSpec()
         )
     ) {
-        Column {
-            children.forEach { c ->
-                CommentTree(level = level + 1, comment = c, useCase = useCase)
+        if (showChildren) {
+            Column {
+                children.forEach { c ->
+                    CommentTree(level = level + 1, comment = c, useCase = useCase)
+                }
             }
         }
     }
@@ -187,8 +184,6 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
             .getRelativeTimeSpanString(comment.unixTime, Instant.now().epochSecond, 0)
             .toString()
     }
-
-    val context = ContextAmbient.current
 
     Column(
         modifier = modifier.padding(end = 10.dp)
@@ -207,6 +202,7 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.subtitle1
             )
         }
+        val context = ContextAmbient.current
         HtmlText(html = comment.content) { url ->
             launchBrowser(url, context)
         }

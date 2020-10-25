@@ -85,14 +85,14 @@ class HackerNewsDb(
         order: Long
     ) = coroutineScope {
         database.commentQueries.insert(
-            id,
-            username,
-            unixTime,
-            content,
-            postId,
-            parent,
-            childrenCnt,
-            order
+            id = id,
+            username = username,
+            unixTime = unixTime,
+            content = content,
+            postid = postId,
+            parent = parent,
+            childrenCnt = childrenCnt,
+            sortorder = order
         )
     }
 
