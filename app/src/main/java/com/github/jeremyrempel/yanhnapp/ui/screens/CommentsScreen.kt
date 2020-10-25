@@ -30,10 +30,10 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +54,7 @@ import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -71,13 +69,12 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
     var state by remember { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
 
-    LaunchedTask(post.id) {
-        async(Dispatchers.IO) {
-            try {
-                useCase.requestAndStoreComments(post.id)
-            } catch (e: Exception) {
-                state = Lce.Error(e.localizedMessage ?: "")
-            }
+
+    rememberCoroutineScope().launch {
+        try {
+            useCase.requestAndStoreComments(post.id)
+        } catch (e: Exception) {
+            state = Lce.Error(e.localizedMessage ?: "")
         }
 
         useCase.getCommentsForPost(post.id).collectLatest {
@@ -103,7 +100,6 @@ fun CommentList(
     post: Post,
     useCase: CommentsUseCase
 ) {
-
     ScrollableColumn {
         CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
 
@@ -121,11 +117,9 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
     var showChildren by remember(comment.id) { mutableStateOf(true) }
     var children by remember(comment.id) { mutableStateOf(emptyList<Comment>()) }
 
-    LaunchedTask(comment.id) {
-        launch {
-            useCase.getCommentsForParent(comment.id).collectLatest {
-                children = it
-            }
+    rememberCoroutineScope().launch {
+        useCase.getCommentsForParent(comment.id).collectLatest {
+            children = it
         }
     }
 
