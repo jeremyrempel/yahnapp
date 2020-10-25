@@ -1,7 +1,7 @@
 package com.github.jeremyrempel.yanhnapp.ui
 
+import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.model.Comment
 
 object SampleData {
     val posts = listOf(
@@ -91,37 +91,37 @@ object SampleData {
         )
     )
 
-    val commentList = listOf(
-        Comment(
-            "En",
-            6,
-            "&#34;Lorem Ipsum&&#34;<p> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-            listOf(
-                Comment(
-                    "Kaiman",
-                    6,
-                    "L2: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                    listOf(
-                        Comment(
-                            "Nikaido",
-                            4,
-                            "L3: I'm a short one liner reply",
-                            listOf(
-                                Comment(
-                                    "Shen",
-                                    10,
-                                    "L3: Nikaido. Are you a sorceror?"
-                                )
-                            )
-                        ),
-                        Comment(
-                            "Ebisu",
-                            1,
-                            "L3: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                        )
-                    )
-                ),
-            )
-        ),
+    val commentList = listOf<Comment>(
+        // Comment(
+        //     "En",
+        //     6,
+        //     "&#34;Lorem Ipsum&&#34;<p> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+        //     listOf(
+        //         Comment(
+        //             "Kaiman",
+        //             6,
+        //             "L2: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+        //             listOf(
+        //                 Comment(
+        //                     "Nikaido",
+        //                     4,
+        //                     "L3: I'm a short one liner reply",
+        //                     listOf(
+        //                         Comment(
+        //                             "Shen",
+        //                             10,
+        //                             "L3: Nikaido. Are you a sorceror?"
+        //                         )
+        //                     )
+        //                 ),
+        //                 Comment(
+        //                     "Ebisu",
+        //                     1,
+        //                     "L3: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+        //                 )
+        //             )
+        //         ),
+        //     )
+        // ),
     )
 }

@@ -1,0 +1,24 @@
+CREATE TABLE comment (
+     id INTEGER NOT NULL PRIMARY KEY,
+     username TEXT NOT NULL,
+     unixTime INTEGER NOT NULL,
+     content TEXT NOT NULL,
+     postid INTEGER NOT NULL,
+     parent INTEGER,
+     childrenCnt INTEGER NOT NULL,
+     sortorder INTEGER NOT NULL,
+     lastUpdated INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY(parent) REFERENCES comment(id) ON DELETE CASCADE,
+     FOREIGN KEY(postid) REFERENCES post(id) ON DELETE CASCADE
+);
+
+insert:
+INSERT OR REPLACE INTO comment (id, username, unixTime, content, postid, parent, childrenCnt, sortorder, lastUpdated, created)
+VALUES (?,?,?,?,?,?,?,?,date('now'),date('now'));
+
+selectCommentsByPost:
+SELECT * FROM comment WHERE parent IS NULL AND postid = ? ORDER BY sortorder ASC;
+
+selectCommentsByParent:
+SELECT * FROM comment WHERE parent = ? ORDER BY sortorder ASC;

@@ -2,39 +2,13 @@ package com.github.jeremyrempel.yahnapp.api
 
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.features.compression.ContentEncoding
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.logging.LogLevel
-import io.ktor.client.features.logging.Logger
-import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
-import kotlinx.serialization.json.Json
 
 class HackerNewsApi(
     private val scheme: String = "https",
     private val host: String = "hacker-news.firebaseio.com",
-    private val networkDebug: (String) -> Unit
+    private val client: HttpClient
 ) {
-    private val client = HttpClient(OkHttp) {
-        install(JsonFeature) {
-            val config = Json.Default
-            serializer = KotlinxSerializer(config)
-        }
-        ContentEncoding {
-            gzip()
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    networkDebug("Network: $message")
-                }
-            }
-
-            level = LogLevel.INFO
-        }
-    }
 
     suspend fun fetchItem(id: Long): Item {
         return client.get(

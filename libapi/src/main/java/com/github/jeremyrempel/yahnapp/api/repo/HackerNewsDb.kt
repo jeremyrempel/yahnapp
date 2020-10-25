@@ -16,11 +16,12 @@ class HackerNewsDb(
     context: Application
 ) {
 
-    private val driver = AndroidSqliteDriver(Database.Schema, context, "yahn.db")
-    private val database = Database(driver)
-
-    fun close() {
-        driver.close()
+    // first access will perform upgrade on open
+    private val driver by lazy {
+        AndroidSqliteDriver(Database.Schema, context, "yahn.db")
+    }
+    private val database by lazy {
+        Database(driver)
     }
 
     suspend fun store(post: Post) = coroutineScope {
@@ -65,6 +66,36 @@ class HackerNewsDb(
         database.postQueries.markPostCommentAsViewed(id)
     }
 
+    suspend fun selectCommentsByPost(id: Long) = coroutineScope {
+        database.commentQueries.selectCommentsByPost(id).asFlow().mapToList()
+    }
+
+    suspend fun selectCommentsByParent(id: Long) = coroutineScope {
+        database.commentQueries.selectCommentsByParent(id).asFlow().mapToList()
+    }
+
+    suspend fun insertComment(
+        id: Long,
+        username: String,
+        unixTime: Long,
+        content: String,
+        postId: Long,
+        parent: Long?,
+        childrenCnt: Long,
+        order: Long
+    ) = coroutineScope {
+        database.commentQueries.insert(
+            id = id,
+            username = username,
+            unixTime = unixTime,
+            content = content,
+            postid = postId,
+            parent = parent,
+            childrenCnt = childrenCnt,
+            sortorder = order
+        )
+    }
+
     suspend fun getPref(key: String): Pref? = coroutineScope {
         withContext(Dispatchers.IO) {
             database.prefsQueries.get(key).executeAsOneOrNull()
@@ -79,5 +110,9 @@ class HackerNewsDb(
                 database.prefsQueries.insertInt(key, value)
             }
         }
+    }
+
+    fun close() {
+        driver.close()
     }
 }

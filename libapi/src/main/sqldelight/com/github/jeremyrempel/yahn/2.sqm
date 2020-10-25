@@ -1,0 +1,14 @@
+CREATE TABLE comment (
+     id INTEGER NOT NULL PRIMARY KEY,
+     username TEXT NOT NULL,
+     unixTime INTEGER NOT NULL,
+     content TEXT NOT NULL,
+     postid INTEGER NOT NULL,
+     parent INTEGER,
+     childrenCnt INTEGER NOT NULL,
+     sortorder INTEGER NOT NULL,
+     lastUpdated INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     created INTEGER NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     FOREIGN KEY(parent) REFERENCES comment(id) ON DELETE CASCADE,
+     FOREIGN KEY(postid) REFERENCES post(id) ON DELETE CASCADE
+);
