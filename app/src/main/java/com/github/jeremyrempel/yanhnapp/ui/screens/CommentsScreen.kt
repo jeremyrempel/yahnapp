@@ -109,7 +109,12 @@ fun CommentList(
     useCase: CommentsUseCase
 ) {
     ScrollableColumn {
-        CommentHeader(title = post.title, domain = post.domain, date = post.unixTime)
+        CommentHeader(
+            title = post.title,
+            domain = post.domain,
+            date = post.unixTime,
+            content = post.text
+        )
 
         comments.forEach { comment ->
             CommentTree(level = 0, comment = comment, useCase)
@@ -212,7 +217,7 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CommentHeader(title: String, domain: String?, date: Long) {
+private fun CommentHeader(title: String, domain: String?, date: Long, content: String?) {
     val relativeDate =
         remember(date) {
             DateUtils.getRelativeTimeSpanString(
@@ -238,6 +243,13 @@ private fun CommentHeader(title: String, domain: String?, date: Long) {
                 Text(text = domain, style = MaterialTheme.typography.body2)
             }
             Text(text = relativeDate, style = MaterialTheme.typography.body2)
+        }
+
+        if (content != null) {
+            val context = ContextAmbient.current
+            HtmlText(html = content) { url ->
+                launchBrowser(url, context)
+            }
         }
 
         Divider(modifier = Modifier.fillMaxWidth().padding(top = 15.dp))
@@ -305,7 +317,8 @@ fun CommentHeaderPreview() {
         CommentHeader(
             "My Cool Post",
             "cnn.com",
-            Instant.now().minus(1, ChronoUnit.HOURS).epochSecond
+            Instant.now().minus(1, ChronoUnit.HOURS).epochSecond,
+            "This is my content from a ASK HN or something"
         )
     }
 }

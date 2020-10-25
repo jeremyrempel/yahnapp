@@ -26,7 +26,6 @@ import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 
 sealed class Screen {
     data class List(val isLoading: Boolean = false) : Screen()
-    data class ViewOne(val post: Post) : Screen()
     data class ViewComments(val post: Post) : Screen()
 }
 
@@ -66,14 +65,6 @@ fun MainScreen() {
                     content = { CommentsScreen(post = screen.post, commentUseCase) },
                     showUp = true,
                     title = R.string.comments_title,
-                    onUpaction = { currentScreen.value = Screen.List() }
-                )
-            }
-            is Screen.ViewOne -> {
-                ScaffoldWithContent(
-                    content = { ViewOne((currentScreen.value as Screen.ViewOne).post) },
-                    showUp = true,
-                    title = R.string.app_name,
                     onUpaction = { currentScreen.value = Screen.List() }
                 )
             }

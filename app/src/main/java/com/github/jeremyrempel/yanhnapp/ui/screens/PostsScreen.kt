@@ -65,7 +65,8 @@ fun ListContent(
                 if (url != null) {
                     launchBrowser(url, context)
                 } else {
-                    navigateTo(Screen.ViewOne(post))
+                    vm.markPostCommentViewed(post.id)
+                    navigateTo(Screen.ViewComments(post))
                 }
             },
             onSelectPostComment = { post ->
