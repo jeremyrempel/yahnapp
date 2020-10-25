@@ -55,8 +55,10 @@ import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -69,16 +71,17 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
     var state by remember { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
 
-
     rememberCoroutineScope().launch {
         try {
             useCase.requestAndStoreComments(post.id)
-        } catch (e: Exception) {
-            state = Lce.Error(e.localizedMessage ?: "")
-        }
 
-        useCase.getCommentsForPost(post.id).collectLatest {
-            state = Lce.Content(it)
+            useCase.getCommentsForPost(post.id).collectLatest {
+                delay(100)
+                state = Lce.Content(it)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            state = Lce.Error(e.localizedMessage ?: "")
         }
     }
 
@@ -119,6 +122,7 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
 
     rememberCoroutineScope().launch {
         useCase.getCommentsForParent(comment.id).collectLatest {
+            delay(100)
             children = it
         }
     }

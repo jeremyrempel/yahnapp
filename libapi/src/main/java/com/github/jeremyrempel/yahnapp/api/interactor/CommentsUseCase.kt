@@ -7,8 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
-import java.io.IOException
+import kotlinx.coroutines.withContext
 
 class CommentsUseCase(
     private val db: HackerNewsDb,
@@ -17,12 +16,7 @@ class CommentsUseCase(
 
     @Suppress("DeferredResultUnused")
     suspend fun requestAndStoreComments(postId: Long) = coroutineScope {
-        try {
-            fetchAndStoreCommentsForPost(postId)
-        } catch (e: IOException) {
-            Timber.e(e)
-            throw e
-        }
+        fetchAndStoreCommentsForPost(postId)
     }
 
     @Suppress("DeferredResultUnused")
@@ -56,16 +50,18 @@ class CommentsUseCase(
                     it.await()
                 }
                 .forEach { item ->
-                    db.insertComment(
-                        id = item.id.toLong(),
-                        username = item.by ?: "n/a",
-                        unixTime = item.time,
-                        content = item.text ?: "",
-                        postId = postId,
-                        parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
-                        childrenCnt = item.kids?.size?.toLong() ?: 0,
-                        order = cnt.toLong()
-                    )
+                    withContext(Dispatchers.Default) {
+                        db.insertComment(
+                            id = item.id.toLong(),
+                            username = item.by ?: "n/a",
+                            unixTime = item.time,
+                            content = item.text ?: "",
+                            postId = postId,
+                            parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
+                            childrenCnt = item.kids?.size?.toLong() ?: 0,
+                            order = cnt.toLong()
+                        )
+                    }
                     cnt++
 
                     getCommentsByIds(item.kids ?: listOf(), postId, level + 1)
