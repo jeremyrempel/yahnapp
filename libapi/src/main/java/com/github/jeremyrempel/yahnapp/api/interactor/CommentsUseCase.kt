@@ -16,7 +16,8 @@ class CommentsUseCase(
 
     @Suppress("DeferredResultUnused")
     suspend fun requestAndStoreComments(postId: Long) = coroutineScope {
-        fetchAndStoreCommentsForPost(postId)
+        val kids = (api.fetchItem(postId).kids ?: emptyList())
+        getCommentsByIds(kids, postId)
     }
 
     @Suppress("DeferredResultUnused")
@@ -26,14 +27,6 @@ class CommentsUseCase(
 
     suspend fun getCommentsForParent(parentCommentId: Long): Flow<List<Comment>> {
         return db.selectCommentsByParent(parentCommentId)
-    }
-
-    /**
-     * Given list of trees, fetch all leafs and metadata
-     */
-    private suspend fun fetchAndStoreCommentsForPost(postId: Long) {
-        val kids = (api.fetchItem(postId).kids ?: emptyList())
-        getCommentsByIds(kids, postId)
     }
 
     private suspend fun getCommentsByIds(commentIds: List<Long>, postId: Long, level: Int = 1) {

@@ -30,6 +30,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,6 @@ import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -71,17 +71,22 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
     var state by remember { mutableStateOf<Lce<List<Comment>>>(Lce.Loading()) }
 
-    rememberCoroutineScope().launch {
+    LaunchedTask(post.id) {
+        useCase.getCommentsForPost(post.id).collectLatest {
+            state = try {
+                Lce.Content(it)
+            } catch (e: java.lang.Exception) {
+                Timber.e(e)
+                Lce.Error(e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    LaunchedTask(post.id) {
         try {
             useCase.requestAndStoreComments(post.id)
-
-            useCase.getCommentsForPost(post.id).collectLatest {
-                delay(100)
-                state = Lce.Content(it)
-            }
         } catch (e: Exception) {
             Timber.e(e)
-            state = Lce.Error(e.localizedMessage ?: "")
         }
     }
 
@@ -122,7 +127,6 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
 
     rememberCoroutineScope().launch {
         useCase.getCommentsForParent(comment.id).collectLatest {
-            delay(100)
             children = it
         }
     }
