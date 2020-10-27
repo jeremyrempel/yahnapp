@@ -9,15 +9,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumnForIndexed
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedTask
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawOpacity
@@ -28,13 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
+import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
-import com.github.jeremyrempel.yanhnapp.ui.components.Loading
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import timber.log.Timber
 import java.time.Instant
 
 @ExperimentalCoroutinesApi
@@ -43,17 +50,46 @@ fun ListContent(
     scrollState: LazyListState,
     navigateTo: (Screen) -> Unit
 ) {
-    val vm: MyVm = viewModel()
-    val posts by vm.posts.collectAsState()
-    val error by vm.errorMsg.collectAsState()
+    val vm = viewModel<MyVm>()
+    val useCase = PostsUseCase(
+        vm.db,
+        vm.api
+    )
 
-    if (posts.isEmpty()) {
-        if (!error.isNullOrEmpty()) {
-            Text("Error: $error")
-        } else {
-            Loading()
+    val posts by useCase.selectAllPostsByRank().collectAsState(initial = emptyList())
+    var loadProgress by remember { mutableStateOf(0.0f) }
+
+    var errorMsgVisible by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedTask {
+        try {
+            useCase.requestAndStorePosts {
+                loadProgress = it
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            error = e.localizedMessage
+            errorMsgVisible = true
         }
-    } else {
+    }
+
+    Column {
+        if (loadProgress < 1 && error == null) {
+            LinearProgressIndicator(
+                loadProgress,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        if (error != null && errorMsgVisible) {
+            val errorTxt = error!!
+            Text(errorTxt)
+            TextButton(onClick = { errorMsgVisible = false }) {
+                Text("Dismiss")
+            }
+        }
+
         val context = ContextAmbient.current
         PostsList(
             data = posts,
@@ -84,11 +120,18 @@ fun PostsList(
     onSelectPost: (Post) -> Unit,
     onSelectPostComment: (Post) -> Unit
 ) {
-    LazyColumnFor(
+    LazyColumnForIndexed(
         items = data,
         state = scrollState
-    ) { row ->
+    ) { index, row ->
         PostRow(row, onSelectPost, onSelectPostComment)
+
+        if (data.size - 1 == index) {
+            onActive {
+                // todo implement load more
+                Timber.d("reached end. load more")
+            }
+        }
     }
 }
 

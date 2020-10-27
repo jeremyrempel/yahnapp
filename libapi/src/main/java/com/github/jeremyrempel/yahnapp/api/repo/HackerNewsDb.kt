@@ -51,8 +51,12 @@ class HackerNewsDb(
         }
     }
 
-    suspend fun selectAllPostsByRank(): Flow<List<Post>> = coroutineScope {
-        database.topPostsQueries.selectPostsByRank().asFlow().mapToList()
+    fun selectAllPostsByRank(): Flow<List<Post>> {
+        return database
+            .topPostsQueries
+            .selectPostsByRank()
+            .asFlow()
+            .mapToList()
     }
 
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
@@ -121,13 +125,13 @@ class HackerNewsDb(
     }
 
     suspend fun getPref(key: String): Pref? = coroutineScope {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             database.prefsQueries.get(key).executeAsOneOrNull()
         }
     }
 
     suspend fun savePref(key: String, value: Long) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             if (database.prefsQueries.get(key).executeAsOneOrNull() != null) {
                 database.prefsQueries.updateInt(value, key)
             } else {
