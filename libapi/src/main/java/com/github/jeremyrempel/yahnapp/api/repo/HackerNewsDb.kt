@@ -60,9 +60,11 @@ class HackerNewsDb(
     }
 
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
-        database.topPostsQueries.truncateTopPosts()
-        topPosts.forEachIndexed { rank, postId ->
-            database.topPostsQueries.insertTopPost(postId, rank.toLong())
+        withContext(Dispatchers.Default) {
+            database.topPostsQueries.truncateTopPosts()
+            topPosts.forEachIndexed { rank, postId ->
+                database.topPostsQueries.insertTopPost(postId, rank.toLong())
+            }
         }
     }
 
