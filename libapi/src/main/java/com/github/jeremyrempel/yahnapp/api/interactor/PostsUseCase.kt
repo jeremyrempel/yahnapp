@@ -64,6 +64,7 @@ class PostsUseCase(
         progressUpdate(1.0f)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun Item.toPost(): Post {
         val item = this
 
