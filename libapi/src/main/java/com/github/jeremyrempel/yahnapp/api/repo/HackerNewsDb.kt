@@ -12,8 +12,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
-class HackerNewsDb(
+class HackerNewsDb @Inject constructor(
     context: Application
 ) {
 

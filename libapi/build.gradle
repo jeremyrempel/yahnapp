@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
 
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
     id 'com.squareup.sqldelight' version "1.4.4"
@@ -25,11 +26,11 @@ sqldelight {
 dependencies {
     // network
     api "org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version"
-    implementation "io.ktor:ktor-client-okhttp:$ktor_version"
-    implementation "io.ktor:ktor-client-serialization:${ktor_version}"
-    implementation "io.ktor:ktor-client-logging:${ktor_version}"
-    implementation "io.ktor:ktor-client-encoding:${ktor_version}"
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    api "io.ktor:ktor-client-okhttp:$ktor_version"
+    api "io.ktor:ktor-client-serialization:${ktor_version}"
+    api "io.ktor:ktor-client-logging:${ktor_version}"
+    api "io.ktor:ktor-client-encoding:${ktor_version}"
+    api 'com.squareup.okhttp3:okhttp:4.9.0'
 
     // coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
@@ -40,6 +41,10 @@ dependencies {
     // database
     api 'com.squareup.sqldelight:coroutines-extensions:1.4.4'
     implementation 'com.squareup.sqldelight:android-driver:1.4.4'
+
+    // dagger
+    implementation "com.google.dagger:hilt-android:$dagger_version"
+    kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
 
     testImplementation "junit:junit:$junit_version"
 }

@@ -1,7 +1,11 @@
 package com.github.jeremyrempel.yahnapp.api.di
 
-import android.content.Context
+import android.app.Application
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.compression.ContentEncoding
@@ -16,16 +20,19 @@ import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import timber.log.Timber
 
-// todo daggerify
+@Module
+@InstallIn(SingletonComponent::class)
 object NetworkModule {
 
     private const val CACHE_SIZE = 1024L * 1024L * 10L
 
-    private fun provideCache(ctx: Context): Cache {
+    @Provides
+    fun provideCache(ctx: Application): Cache {
         return Cache(ctx.cacheDir, CACHE_SIZE)
     }
 
-    private fun providesClient(cache: Cache): HttpClient {
+    @Provides
+    fun providesClient(cache: Cache): HttpClient {
         return HttpClient(OkHttp) {
             engine {
                 config {
@@ -55,10 +62,8 @@ object NetworkModule {
         }
     }
 
-    fun providesApi(context: Context): HackerNewsApi {
-        val cache = provideCache(context)
-
-        val client = providesClient(cache)
+    @Provides
+    fun providesApi(client: HttpClient): HackerNewsApi {
         return HackerNewsApi(client = client)
     }
 }
