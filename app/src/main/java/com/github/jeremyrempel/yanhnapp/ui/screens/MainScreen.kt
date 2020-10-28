@@ -17,23 +17,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.viewModel
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
+import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
-import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 sealed class Screen {
     data class List(val isLoading: Boolean = false) : Screen()
     data class ViewComments(val post: Post) : Screen()
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalLazyDsl
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    commentsUseCase: CommentsUseCase,
+    postsUseCase: PostsUseCase
+) {
     val currentScreen = remember { mutableStateOf<Screen>(Screen.List()) }
     val scrollState = rememberLazyListState()
 
@@ -43,7 +47,7 @@ fun MainScreen() {
             is Screen.List -> {
                 ScaffoldWithContent(
                     content = {
-                        ListContent(scrollState) { newScreen ->
+                        ListContent(scrollState, postsUseCase, commentsUseCase) { newScreen ->
                             currentScreen.value = newScreen
                         }
                     },
@@ -53,16 +57,8 @@ fun MainScreen() {
                 )
             }
             is Screen.ViewComments -> {
-
-                // todo pass in
-                val vm = viewModel<MyVm>()
-                val commentUseCase = CommentsUseCase(
-                    db = vm.db,
-                    api = vm.api
-                )
-
                 ScaffoldWithContent(
-                    content = { CommentsScreen(post = screen.post, commentUseCase) },
+                    content = { CommentsScreen(post = screen.post, commentsUseCase) },
                     showUp = true,
                     title = R.string.comments_title,
                     onUpaction = { currentScreen.value = Screen.List() }

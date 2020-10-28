@@ -7,16 +7,19 @@ import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.URL
 import java.time.Instant
+import javax.inject.Inject
 
-class PostsUseCase(
+class PostsUseCase @Inject constructor(
     private val db: HackerNewsDb,
     private val api: HackerNewsApi
 ) {
@@ -101,5 +104,12 @@ class PostsUseCase(
         return db
             .selectAllPostsByRank()
             .flowOn(Dispatchers.Default)
+    }
+
+    fun markPostViewed(id: Long) {
+        // todo scope
+        GlobalScope.launch(Dispatchers.IO) {
+            db.markPostAsRead(id)
+        }
     }
 }

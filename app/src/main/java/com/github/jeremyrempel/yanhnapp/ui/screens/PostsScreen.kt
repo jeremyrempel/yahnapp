@@ -31,14 +31,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
+import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
-import com.github.jeremyrempel.yanhnapp.ui.vm.MyVm
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import timber.log.Timber
@@ -48,14 +47,10 @@ import java.time.Instant
 @Composable
 fun ListContent(
     scrollState: LazyListState,
+    useCase: PostsUseCase,
+    commentsUseCase: CommentsUseCase,
     navigateTo: (Screen) -> Unit
 ) {
-    val vm = viewModel<MyVm>()
-    val useCase = PostsUseCase(
-        vm.db,
-        vm.api
-    )
-
     val posts by useCase.selectAllPostsByRank().collectAsState(initial = emptyList())
     var loadProgress by remember { mutableStateOf(0.0f) }
 
@@ -95,18 +90,18 @@ fun ListContent(
             data = posts,
             scrollState,
             onSelectPost = { post ->
-                vm.markPostViewed(post.id)
+                useCase.markPostViewed(post.id)
 
                 val url = post.url
                 if (url != null) {
                     launchBrowser(url, context)
                 } else {
-                    vm.markPostCommentViewed(post.id)
+                    commentsUseCase.markPostCommentViewed(post.id)
                     navigateTo(Screen.ViewComments(post))
                 }
             },
             onSelectPostComment = { post ->
-                vm.markPostCommentViewed(post.id)
+                commentsUseCase.markPostCommentViewed(post.id)
                 navigateTo(Screen.ViewComments(post))
             }
         )

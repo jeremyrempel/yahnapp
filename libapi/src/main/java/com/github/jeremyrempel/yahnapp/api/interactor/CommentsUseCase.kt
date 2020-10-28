@@ -4,12 +4,15 @@ import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CommentsUseCase(
+class CommentsUseCase @Inject constructor(
     private val db: HackerNewsDb,
     private val api: HackerNewsApi
 ) {
@@ -79,6 +82,13 @@ class CommentsUseCase(
                         onBranchCompleted()
                     }
                 }
+        }
+    }
+
+    fun markPostCommentViewed(id: Long) {
+        // todo scope
+        GlobalScope.launch {
+            db.markCommentRead(id)
         }
     }
 
