@@ -19,6 +19,11 @@ import io.ktor.client.request.header
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import timber.log.Timber
+import javax.inject.Qualifier
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+private annotation class InternalApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -27,12 +32,14 @@ object NetworkModule {
     private const val CACHE_SIZE = 1024L * 1024L * 10L
 
     @Provides
+    @InternalApi
     fun provideCache(ctx: Application): Cache {
         return Cache(ctx.cacheDir, CACHE_SIZE)
     }
 
     @Provides
-    fun providesClient(cache: Cache): HttpClient {
+    @InternalApi
+    fun providesClient(@InternalApi cache: Cache): HttpClient {
         return HttpClient(OkHttp) {
             engine {
                 config {
@@ -63,7 +70,7 @@ object NetworkModule {
     }
 
     @Provides
-    fun providesApi(client: HttpClient): HackerNewsApi {
+    fun providesApi(@InternalApi client: HttpClient): HackerNewsApi {
         return HackerNewsApi(client = client)
     }
 }
