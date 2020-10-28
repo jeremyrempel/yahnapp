@@ -4,8 +4,6 @@ import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.time.temporal.Temporal
-import java.time.temporal.TemporalUnit
 
 object SampleData {
     val posts = listOf(
