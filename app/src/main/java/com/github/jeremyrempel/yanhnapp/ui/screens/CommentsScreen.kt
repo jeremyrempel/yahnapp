@@ -185,11 +185,9 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
             animSpec = TweenSpec()
         )
     ) {
-        if (showChildren) {
-            Column {
-                children.forEach { c ->
-                    CommentTree(level = level + 1, comment = c, useCase = useCase)
-                }
+        Column {
+            children.forEach { c ->
+                CommentTree(level = level + 1, comment = c, useCase = useCase)
             }
         }
     }
