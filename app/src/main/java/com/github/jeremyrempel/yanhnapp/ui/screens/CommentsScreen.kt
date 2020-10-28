@@ -55,7 +55,9 @@ import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.Instant
@@ -108,17 +110,18 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
             )
         }
 
-        CommentList(comments = data, post, useCase)
+        CommentList(comments = data, post, useCase::getCommentsForParent)
     }
 }
 
+@ExperimentalLazyDsl
 @ExperimentalAnimationApi
 @ExperimentalLayout
 @Composable
 fun CommentList(
     comments: List<Comment>,
     post: Post,
-    useCase: CommentsUseCase
+    getComments: suspend (Long) -> Flow<List<Comment>>
 ) {
     ScrollableColumn {
         CommentHeader(
@@ -129,7 +132,7 @@ fun CommentList(
         )
 
         comments.forEach { comment ->
-            CommentTree(level = 0, comment = comment, useCase)
+            CommentTree(level = 0, comment = comment, getComments = getComments)
         }
     }
 }
@@ -137,13 +140,17 @@ fun CommentList(
 @ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
-fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
+fun CommentTree(
+    level: Int,
+    comment: Comment,
+    getComments: suspend (Long) -> Flow<List<Comment>>
+) {
 
     var showChildren by remember(comment.id) { mutableStateOf(true) }
     var children by remember(comment.id) { mutableStateOf(emptyList<Comment>()) }
 
     rememberCoroutineScope().launch {
-        useCase.getCommentsForParent(comment.id).collectLatest {
+        getComments(comment.id).collectLatest {
             children = it
         }
     }
@@ -187,7 +194,7 @@ fun CommentTree(level: Int, comment: Comment, useCase: CommentsUseCase) {
     ) {
         Column {
             children.forEach { c ->
-                CommentTree(level = level + 1, comment = c, useCase = useCase)
+                CommentTree(level = level + 1, comment = c, getComments = getComments)
             }
         }
     }
@@ -345,7 +352,13 @@ fun SingleCommentPreview() {
 @Preview(showBackground = true)
 @Composable
 fun CommentPreview() {
+    val getComments: suspend (Long) -> Flow<List<Comment>> = {
+        flow {
+            emit(SampleData.commentList)
+        }
+    }
+
     YetAnotherHNAppTheme {
-        // CommentList(comments = SampleData.commentList, SampleData.posts.first())
+        CommentList(SampleData.commentList, SampleData.posts.first(), getComments)
     }
 }

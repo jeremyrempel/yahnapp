@@ -2,6 +2,10 @@ package com.github.jeremyrempel.yanhnapp.ui
 
 import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.time.temporal.Temporal
+import java.time.temporal.TemporalUnit
 
 object SampleData {
     val posts = listOf(
@@ -91,7 +95,20 @@ object SampleData {
         )
     )
 
-    val commentList = listOf<Comment>(
+    val commentList = listOf(
+        Comment(
+            id = 1,
+            username = "En",
+            unixTime = Instant.now().minus(10, ChronoUnit.MINUTES).epochSecond,
+            content = "&#34;Lorem Ipsum&&#34;<p> is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+            postid = 1,
+            childrenCnt = 2,
+            created = 0,
+            lastUpdated = 0,
+            parent = null,
+            sortorder = 1
+        )
+
         // Comment(
         //     "En",
         //     6,
