@@ -83,7 +83,7 @@ dependencies {
 
     // dagger
     implementation "com.google.dagger:hilt-android:$dagger_version"
-    kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
+    kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     testImplementation "junit:junit:$junit_version"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
