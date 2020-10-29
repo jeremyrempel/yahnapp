@@ -15,14 +15,12 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     @Provides
-    @InternalApi
     fun providesDriver(context: Application): AndroidSqliteDriver {
         // first access will upgrade
         return AndroidSqliteDriver(Database.Schema, context, "yahn.db")
     }
 
     @Provides
-    @InternalApi
     fun providesDatabase(driver: AndroidSqliteDriver): Database {
         return Database(driver)
     }
