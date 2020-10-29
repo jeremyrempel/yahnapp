@@ -19,11 +19,7 @@ import io.ktor.client.request.header
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import timber.log.Timber
-import javax.inject.Qualifier
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-private annotation class InternalApi
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -70,6 +66,7 @@ object NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun providesApi(@InternalApi client: HttpClient): HackerNewsApi {
         return HackerNewsApi(client = client)
     }

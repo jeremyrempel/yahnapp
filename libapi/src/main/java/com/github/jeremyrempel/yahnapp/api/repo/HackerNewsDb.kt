@@ -1,10 +1,8 @@
 package com.github.jeremyrempel.yahnapp.api.repo
 
-import android.app.Application
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahn.Pref
 import com.github.jeremyrempel.yanhnapp.lib.Database
-import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
@@ -12,19 +10,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
-class HackerNewsDb @Inject constructor(
-    context: Application
-) {
-
-    // first access will perform upgrade on open
-    private val driver by lazy {
-        AndroidSqliteDriver(Database.Schema, context, "yahn.db")
-    }
-    private val database by lazy {
-        Database(driver)
-    }
+class HackerNewsDb(private val database: Database) {
 
     suspend fun storePost(post: Post) = coroutineScope {
         val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
@@ -141,9 +128,5 @@ class HackerNewsDb @Inject constructor(
                 database.prefsQueries.insertInt(key, value)
             }
         }
-    }
-
-    fun close() {
-        driver.close()
     }
 }
