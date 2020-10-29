@@ -107,8 +107,6 @@ fun ListContent(
                     navigateTo(Screen.ViewComments(post))
                 }
             )
-        } else {
-            Text("No posts to show :(")
         }
     }
 }
