@@ -85,26 +85,31 @@ fun ListContent(
             }
         }
 
-        val context = ContextAmbient.current
-        PostsList(
-            data = posts,
-            scrollState,
-            onSelectPost = { post ->
-                useCase.markPostViewed(post.id)
+        if (posts.isNotEmpty()) {
 
-                val url = post.url
-                if (url != null) {
-                    launchBrowser(url, context)
-                } else {
+            val context = ContextAmbient.current
+            PostsList(
+                data = posts,
+                scrollState,
+                onSelectPost = { post ->
+                    useCase.markPostViewed(post.id)
+
+                    val url = post.url
+                    if (url != null) {
+                        launchBrowser(url, context)
+                    } else {
+                        commentsUseCase.markPostCommentViewed(post.id)
+                        navigateTo(Screen.ViewComments(post))
+                    }
+                },
+                onSelectPostComment = { post ->
                     commentsUseCase.markPostCommentViewed(post.id)
                     navigateTo(Screen.ViewComments(post))
                 }
-            },
-            onSelectPostComment = { post ->
-                commentsUseCase.markPostCommentViewed(post.id)
-                navigateTo(Screen.ViewComments(post))
-            }
-        )
+            )
+        } else {
+            Text("No posts to show :(")
+        }
     }
 }
 
