@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -54,7 +53,6 @@ import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
@@ -63,10 +61,7 @@ import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-@ExperimentalLazyDsl
-@ExperimentalCoroutinesApi
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
 fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
@@ -114,9 +109,7 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
     }
 }
 
-@ExperimentalLazyDsl
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
 fun CommentList(
     comments: List<Comment>,
@@ -137,8 +130,8 @@ fun CommentList(
     }
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
+@OptIn(ExperimentalLayout::class)
 @Composable
 fun CommentTree(
     level: Int,
@@ -346,9 +339,7 @@ fun SingleCommentPreview() {
     SingleComment(comment = SampleData.commentList.first())
 }
 
-@ExperimentalLazyDsl
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun CommentPreview() {

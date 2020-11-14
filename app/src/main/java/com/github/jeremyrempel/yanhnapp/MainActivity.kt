@@ -3,8 +3,6 @@ package com.github.jeremyrempel.yanhnapp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.ui.platform.setContent
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
@@ -22,8 +20,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var postsUseCase: PostsUseCase
 
-    @ExperimentalLazyDsl
-    @ExperimentalLayout
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
