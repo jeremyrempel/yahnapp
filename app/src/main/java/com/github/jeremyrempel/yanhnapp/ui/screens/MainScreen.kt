@@ -3,13 +3,11 @@ package com.github.jeremyrempel.yanhnapp.ui.screens
 import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,17 +20,13 @@ import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 sealed class Screen {
     data class List(val isLoading: Boolean = false) : Screen()
     data class ViewComments(val post: Post) : Screen()
 }
 
-@ExperimentalCoroutinesApi
-@ExperimentalLazyDsl
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
 fun MainScreen(
     commentsUseCase: CommentsUseCase,
