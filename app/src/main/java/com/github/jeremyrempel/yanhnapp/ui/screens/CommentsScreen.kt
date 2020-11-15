@@ -13,7 +13,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
@@ -28,9 +27,10 @@ import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedTask
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +61,7 @@ import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
+@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
@@ -71,13 +72,13 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
     var errorMsgVisible by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedTask(post.id) {
+    LaunchedEffect(post.id) {
         useCase.getCommentsForPost(post.id).collectLatest {
             data = it
         }
     }
 
-    LaunchedTask(post.id) {
+    LaunchedEffect(post.id) {
         try {
             useCase.requestAndStoreComments(post.id) {
                 loadProgress = it
@@ -109,6 +110,7 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
     }
 }
 
+@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun CommentList(
@@ -130,8 +132,8 @@ fun CommentList(
     }
 }
 
+@ExperimentalLayout
 @ExperimentalAnimationApi
-@OptIn(ExperimentalLayout::class)
 @Composable
 fun CommentTree(
     level: Int,
@@ -339,6 +341,7 @@ fun SingleCommentPreview() {
     SingleComment(comment = SampleData.commentList.first())
 }
 
+@ExperimentalLayout
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable

@@ -1,12 +1,12 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember

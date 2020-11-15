@@ -100,7 +100,7 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
 
     ClickableText(
         formattedString,
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onSurface),
         onClick = { offset ->
             formattedString
                 .getStringAnnotations(start = offset, end = offset)
