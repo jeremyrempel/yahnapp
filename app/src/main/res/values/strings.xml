@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">YAHN App</string>
+    <string name="app_name_full">Yet Another Hacker News App</string>
     <string name="content_title">Content</string>
     <string name="comments_title">Comments</string>
     <string name="top_stories_title">Top Stories</string>
+    <string name="about_title">About</string>
 </resources>
