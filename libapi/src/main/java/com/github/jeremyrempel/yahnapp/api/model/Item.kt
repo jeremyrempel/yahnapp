@@ -11,6 +11,7 @@ data class Item(
     val time: Long,
     val text: String? = null,
     val kids: List<Long>? = null,
+    val parts: List<Long>? = null,
     val parent: Int? = null,
     val url: String? = null,
     val score: Int? = null,
