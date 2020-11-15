@@ -7,10 +7,11 @@ import io.ktor.client.request.get
 class HackerNewsApi(
     private val scheme: String = "https",
     private val host: String = "hacker-news.firebaseio.com",
-    private val client: HttpClient
+    private val provideClient: suspend () -> HttpClient
 ) {
 
     suspend fun fetchItem(id: Long): Item {
+        val client = provideClient()
         return client.get(
             scheme = scheme,
             host = host,
@@ -19,6 +20,7 @@ class HackerNewsApi(
     }
 
     suspend fun fetchTopItems(): List<Int> {
+        val client = provideClient()
         return client.get(
             scheme = scheme,
             host = host,

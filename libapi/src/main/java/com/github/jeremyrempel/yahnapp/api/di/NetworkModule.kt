@@ -1,6 +1,7 @@
 package com.github.jeremyrempel.yahnapp.api.di
 
 import android.app.Application
+import android.os.Looper
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import dagger.Module
 import dagger.Provides
@@ -16,9 +17,12 @@ import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.header
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import timber.log.Timber
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -30,12 +34,15 @@ object NetworkModule {
     @Provides
     @InternalApi
     fun provideCache(ctx: Application): Cache {
+        checkMainThread()
         return Cache(ctx.cacheDir, CACHE_SIZE)
     }
 
     @Provides
+    @Singleton
     @InternalApi
     fun providesClient(@InternalApi cache: Cache): HttpClient {
+        checkMainThread()
         return HttpClient(OkHttp) {
             engine {
                 config {
@@ -66,8 +73,17 @@ object NetworkModule {
     }
 
     @Provides
-    @Singleton
-    fun providesApi(@InternalApi client: HttpClient): HackerNewsApi {
-        return HackerNewsApi(client = client)
+    fun providesApi(@InternalApi client: Provider<HttpClient>): HackerNewsApi {
+        return HackerNewsApi {
+            withContext(Dispatchers.Default) {
+                client.get()
+            }
+        }
+    }
+
+    private fun checkMainThread() {
+        require(Looper.getMainLooper() != Looper.myLooper()) {
+            "Main thread check failed"
+        }
     }
 }
