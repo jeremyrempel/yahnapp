@@ -3,6 +3,8 @@ package com.github.jeremyrempel.yahnapp.api
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HackerNewsApi(
     private val scheme: String = "https",
@@ -11,20 +13,24 @@ class HackerNewsApi(
 ) {
 
     suspend fun fetchItem(id: Long): Item {
-        val client = provideClient()
-        return client.get(
-            scheme = scheme,
-            host = host,
-            path = "/v0/item/$id.json"
-        )
+        return withContext(Dispatchers.Default) {
+            val client = provideClient()
+            client.get(
+                scheme = scheme,
+                host = host,
+                path = "/v0/item/$id.json"
+            )
+        }
     }
 
     suspend fun fetchTopItems(): List<Int> {
-        val client = provideClient()
-        return client.get(
-            scheme = scheme,
-            host = host,
-            path = "/v0/topstories.json"
-        )
+        return withContext(Dispatchers.Default) {
+            val client = provideClient()
+            client.get(
+                scheme = scheme,
+                host = host,
+                path = "/v0/topstories.json"
+            )
+        }
     }
 }

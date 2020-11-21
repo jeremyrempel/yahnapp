@@ -6,10 +6,11 @@ import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.util.Date
 import javax.inject.Inject
 
 class CommentsUseCase @Inject constructor(
@@ -27,61 +28,95 @@ class CommentsUseCase @Inject constructor(
 
     suspend fun requestAndStoreComments(postId: Long, progressUpdate: (Float) -> Unit) {
         coroutineScope {
-            withContext(Dispatchers.IO) {
-                val kids = (api.fetchItem(postId).kids ?: emptyList())
 
-                val total = kids.size.toFloat()
-                var currentLoad = 1
+            val kids = (api.fetchItem(postId).kids ?: emptyList())
 
-                getCommentsByIds(kids, postId) {
-                    currentLoad++
-                    val update = currentLoad / total
-                    progressUpdate(update)
-                }
+            val total = kids.size.toFloat()
+            var currentLoad = 1
+            val fetcher = CommentsFetcher(db, api)
 
-                progressUpdate(100f)
+            fetcher.get(kids, postId) {
+                currentLoad++
+                val update = currentLoad / total
+                progressUpdate(update)
             }
+
+            progressUpdate(100f)
         }
     }
 
-    private suspend fun getCommentsByIds(
-        commentIds: List<Long>,
-        postId: Long,
-        level: Int = 1,
-        onBranchCompleted: () -> Unit,
+    private class CommentsFetcher(
+        private val db: HackerNewsDb,
+        private val api: HackerNewsApi,
+        private var data: MutableList<Comment> = mutableListOf(),
+        private val now: Long = Date().time
     ) {
-        coroutineScope {
-            var cnt = 0
 
-            commentIds
-                .map {
-                    async(Dispatchers.IO) {
-                        api.fetchItem(it)
+        companion object {
+            private const val FETCH_LIMIT = 50
+        }
+
+        suspend fun get(
+            commentIds: List<Long>,
+            postId: Long,
+            level: Int = 1,
+            onBranchCompleted: () -> Unit
+        ) {
+            getCommentsByIds(commentIds, postId, level, onBranchCompleted)
+
+            db.storeComments(data)
+        }
+
+        private suspend fun getCommentsByIds(
+            commentIds: List<Long>,
+            postId: Long,
+            level: Int = 1,
+            onBranchCompleted: () -> Unit,
+        ) {
+            coroutineScope {
+                var cnt = 0
+
+                val result = commentIds
+                    .map {
+                        async(Dispatchers.IO) {
+                            api.fetchItem(it)
+                        }
                     }
-                }
-                .map {
-                    it.await()
-                }
-                .forEach { item ->
-                    db.storePost(
-                        id = item.id.toLong(),
-                        username = item.by ?: "n/a",
-                        unixTime = item.time,
-                        content = item.text ?: "",
-                        postId = postId,
-                        parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
-                        childrenCnt = item.kids?.size?.toLong() ?: 0,
-                        order = cnt.toLong()
-                    )
+                    .awaitAll()
+                    .forEach { item ->
+                        val comment = Comment(
+                            id = item.id.toLong(),
+                            username = item.by ?: "n/a",
+                            unixTime = item.time,
+                            content = item.text ?: "",
+                            postid = postId,
+                            parent = if (item.parent?.toLong() != postId) item.parent?.toLong() else null,
+                            childrenCnt = item.kids?.size?.toLong() ?: 0,
+                            sortorder = cnt.toLong(),
+                            created = now,
+                            lastUpdated = now
+                        )
+                        data.add(comment)
 
-                    cnt++
+                        // limit
+                        if (data.size >= FETCH_LIMIT) {
+                            return@coroutineScope
+                        }
 
-                    getCommentsByIds(item.kids ?: listOf(), postId, level + 1, onBranchCompleted)
+                        cnt++
 
-                    if (level == 1) {
-                        onBranchCompleted()
+                        getCommentsByIds(
+                            item.kids ?: listOf(),
+                            postId,
+                            level + 1,
+                            onBranchCompleted
+                        )
+
+                        if (level == 1) {
+                            onBranchCompleted()
+                        }
                     }
-                }
+            }
         }
     }
 

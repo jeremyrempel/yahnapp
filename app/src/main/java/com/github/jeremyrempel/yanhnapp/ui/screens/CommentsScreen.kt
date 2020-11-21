@@ -79,6 +79,7 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
     }
 
     LaunchedEffect(post.id) {
+
         try {
             useCase.requestAndStoreComments(post.id) {
                 loadProgress = it

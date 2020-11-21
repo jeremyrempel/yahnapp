@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yahnapp.api.repo
 
+import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahn.Pref
 import com.github.jeremyrempel.yanhnapp.lib.Database
@@ -8,34 +9,41 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class HackerNewsDb(private val database: Database) {
 
-    suspend fun storePost(post: Post) = coroutineScope {
-        val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
+    suspend fun storePosts(posts: List<Post>) = coroutineScope {
+        launch(Dispatchers.Default) {
+            database.postQueries.transaction {
+                posts.forEach { post ->
+                    val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
 
-        if (postDb != null) {
-            // only update post if something we care about has changed
-            if (postDb.points != post.points || postDb.commentsCnt != post.commentsCnt) {
-                database.postQueries.update(
-                    post.points,
-                    post.commentsCnt,
-                    post.id
-                )
+                    if (postDb != null) {
+                        // only update post if something we care about has changed
+                        if (postDb.points != post.points || postDb.commentsCnt != post.commentsCnt) {
+                            database.postQueries.update(
+                                post.points,
+                                post.commentsCnt,
+                                post.id
+                            )
+                        }
+                    } else {
+                        database.postQueries.insert(
+                            post.id,
+                            post.title,
+                            post.text,
+                            post.domain,
+                            post.url,
+                            post.points,
+                            post.unixTime,
+                            post.commentsCnt
+                        )
+                    }
+                }
             }
-        } else {
-            database.postQueries.insert(
-                post.id,
-                post.title,
-                post.text,
-                post.domain,
-                post.url,
-                post.points,
-                post.unixTime,
-                post.commentsCnt
-            )
         }
     }
 
@@ -48,10 +56,12 @@ class HackerNewsDb(private val database: Database) {
     }
 
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
-        withContext(Dispatchers.Default) {
-            database.topPostsQueries.truncateTopPosts()
-            topPosts.forEachIndexed { rank, postId ->
-                database.topPostsQueries.insertTopPost(postId, rank.toLong())
+        launch(Dispatchers.Default) {
+            database.topPostsQueries.transaction {
+                database.topPostsQueries.truncateTopPosts()
+                topPosts.forEachIndexed { rank, postId ->
+                    database.topPostsQueries.insertTopPost(postId, rank.toLong())
+                }
             }
         }
     }
@@ -72,7 +82,26 @@ class HackerNewsDb(private val database: Database) {
         database.commentQueries.selectCommentsByParent(id).asFlow().mapToList()
     }
 
-    suspend fun storePost(
+    suspend fun storeComments(comments: List<Comment>) = coroutineScope {
+        launch(Dispatchers.Default) {
+            database.commentQueries.transaction {
+                comments.forEach {
+                    storeComment(
+                        it.id,
+                        it.username,
+                        it.unixTime,
+                        it.content,
+                        it.postid,
+                        it.parent,
+                        it.childrenCnt,
+                        it.sortorder
+                    )
+                }
+            }
+        }
+    }
+
+    private fun storeComment(
         id: Long,
         username: String,
         unixTime: Long,
@@ -81,36 +110,33 @@ class HackerNewsDb(private val database: Database) {
         parent: Long?,
         childrenCnt: Long,
         order: Long
-    ) = coroutineScope {
-        withContext(Dispatchers.Default) {
+    ) {
+        val commentDb = database.commentQueries.selectById(id).executeAsOneOrNull()
 
-            val commentDb = database.commentQueries.selectById(id).executeAsOneOrNull()
-
-            if (commentDb != null) {
-                // incremental update
-                if (childrenCnt != commentDb.childrenCnt || content != commentDb.content) {
-                    Timber.v("Cache miss, updating comment: $id, $username, $content, $childrenCnt")
-                    database.commentQueries.updateChildrenContent(
-                        content,
-                        childrenCnt,
-                        id
-                    )
-                } else {
-                    Timber.v("Cache hit, not updating comment: $id")
-                }
-            } else {
-                Timber.v("Cache miss, inserting new comment: $id, $username, $content")
-                database.commentQueries.insert(
-                    id = id,
-                    username = username,
-                    unixTime = unixTime,
-                    content = content,
-                    postid = postId,
-                    parent = parent,
-                    childrenCnt = childrenCnt,
-                    sortorder = order
+        if (commentDb != null) {
+            // incremental update
+            if (childrenCnt != commentDb.childrenCnt || content != commentDb.content) {
+                Timber.v("Cache miss, updating comment: $id, $username, $content, $childrenCnt")
+                database.commentQueries.updateChildrenContent(
+                    content,
+                    childrenCnt,
+                    id
                 )
+            } else {
+                Timber.v("Cache hit, not updating comment: $id")
             }
+        } else {
+            Timber.v("Cache miss, inserting new comment: $id, $username, $content")
+            database.commentQueries.insert(
+                id = id,
+                username = username,
+                unixTime = unixTime,
+                content = content,
+                postid = postId,
+                parent = parent,
+                childrenCnt = childrenCnt,
+                sortorder = order
+            )
         }
     }
 
