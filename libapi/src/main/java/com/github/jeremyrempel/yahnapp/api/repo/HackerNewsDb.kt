@@ -9,14 +9,39 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class HackerNewsDb(private val database: Database) {
+class HackerNewsDb(
+    private val provideDatabase: suspend () -> Database
+) {
+
+    fun selectAllPostsByRank(): Flow<List<Post>> {
+        return flow {
+            val db = provideDatabase()
+            withContext(Dispatchers.Default) {
+                emitAll(db.topPostsQueries.selectPostsByRank().asFlow().mapToList())
+            }
+        }.flowOn(Dispatchers.Default)
+    }
+
+    fun selectCommentsByPost(id: Long): Flow<List<Comment>> {
+        return flow {
+            val db = provideDatabase()
+            withContext(Dispatchers.Default) {
+                emitAll(db.commentQueries.selectCommentsByPost(id).asFlow().mapToList())
+            }
+        }.flowOn(Dispatchers.Default)
+    }
 
     suspend fun storePosts(posts: List<Post>) = coroutineScope {
         launch(Dispatchers.Default) {
+            val database = provideDatabase()
+
             database.postQueries.transaction {
                 posts.forEach { post ->
                     val postDb = database.postQueries.selectPostById(post.id).executeAsOneOrNull()
@@ -47,16 +72,10 @@ class HackerNewsDb(private val database: Database) {
         }
     }
 
-    fun selectAllPostsByRank(): Flow<List<Post>> {
-        return database
-            .topPostsQueries
-            .selectPostsByRank()
-            .asFlow()
-            .mapToList()
-    }
-
     suspend fun replaceTopPosts(topPosts: List<Long>) = coroutineScope {
         launch(Dispatchers.Default) {
+            val database = provideDatabase()
+
             database.topPostsQueries.transaction {
                 database.topPostsQueries.truncateTopPosts()
                 topPosts.forEachIndexed { rank, postId ->
@@ -67,26 +86,25 @@ class HackerNewsDb(private val database: Database) {
     }
 
     suspend fun markPostAsRead(id: Long) = coroutineScope {
-        database.postQueries.markPostAsViewed(id)
+        provideDatabase().postQueries.markPostAsViewed(id)
     }
 
     suspend fun markCommentRead(id: Long) = coroutineScope {
-        database.postQueries.markPostCommentAsViewed(id)
-    }
-
-    suspend fun selectCommentsByPost(id: Long) = coroutineScope {
-        database.commentQueries.selectCommentsByPost(id).asFlow().mapToList()
+        provideDatabase().postQueries.markPostCommentAsViewed(id)
     }
 
     suspend fun selectCommentsByParent(id: Long) = coroutineScope {
+        val database = provideDatabase()
         database.commentQueries.selectCommentsByParent(id).asFlow().mapToList()
     }
 
     suspend fun storeComments(comments: List<Comment>) = coroutineScope {
         launch(Dispatchers.Default) {
+            val database = provideDatabase()
             database.commentQueries.transaction {
                 comments.forEach {
                     storeComment(
+                        database,
                         it.id,
                         it.username,
                         it.unixTime,
@@ -102,6 +120,7 @@ class HackerNewsDb(private val database: Database) {
     }
 
     private fun storeComment(
+        database: Database,
         id: Long,
         username: String,
         unixTime: Long,
@@ -142,12 +161,13 @@ class HackerNewsDb(private val database: Database) {
 
     suspend fun getPref(key: String): Pref? = coroutineScope {
         withContext(Dispatchers.Default) {
-            database.prefsQueries.get(key).executeAsOneOrNull()
+            provideDatabase().prefsQueries.get(key).executeAsOneOrNull()
         }
     }
 
     suspend fun savePref(key: String, value: Long) {
         withContext(Dispatchers.Default) {
+            val database = provideDatabase()
             if (database.prefsQueries.get(key).executeAsOneOrNull() != null) {
                 database.prefsQueries.updateInt(value, key)
             } else {

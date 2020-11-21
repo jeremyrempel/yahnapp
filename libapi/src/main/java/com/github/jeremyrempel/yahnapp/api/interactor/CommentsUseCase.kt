@@ -19,7 +19,7 @@ class CommentsUseCase @Inject constructor(
     private val api: HackerNewsApi
 ) {
 
-    suspend fun getCommentsForPost(postId: Long): Flow<List<Comment>> {
+    fun getCommentsForPost(postId: Long): Flow<List<Comment>> {
         return db.selectCommentsByPost(postId)
     }
 
