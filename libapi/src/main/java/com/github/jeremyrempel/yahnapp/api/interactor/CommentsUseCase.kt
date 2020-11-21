@@ -2,6 +2,7 @@ package com.github.jeremyrempel.yahnapp.api.interactor
 
 import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.PAGE_SIZE
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,10 +53,6 @@ class CommentsUseCase @Inject constructor(
         private val now: Long = Date().time
     ) {
 
-        companion object {
-            private const val FETCH_LIMIT = 50
-        }
-
         suspend fun get(
             commentIds: List<Long>,
             postId: Long,
@@ -99,7 +96,7 @@ class CommentsUseCase @Inject constructor(
                         data.add(comment)
 
                         // limit
-                        if (data.size >= FETCH_LIMIT) {
+                        if (data.size >= PAGE_SIZE) {
                             return@coroutineScope
                         }
 

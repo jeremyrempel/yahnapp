@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.PAGE_SIZE
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +26,6 @@ class PostsUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val PAGE_SIZE = 100
         const val FETCH_TIME_SECONDS = 600L
     }
 
