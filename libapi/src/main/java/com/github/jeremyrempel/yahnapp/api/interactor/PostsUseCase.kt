@@ -4,16 +4,17 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
+import com.github.jeremyrempel.yahnapp.api.PAGE_SIZE
 import com.github.jeremyrempel.yahnapp.api.model.Item
 import com.github.jeremyrempel.yahnapp.api.repo.HackerNewsDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.net.URL
 import java.time.Instant
@@ -25,7 +26,6 @@ class PostsUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val PAGE_SIZE = 100
         const val FETCH_TIME_SECONDS = 600L
     }
 
@@ -37,29 +37,23 @@ class PostsUseCase @Inject constructor(
         Timber.d("last fetch: $lastFetch, fetchLimit: $fetchLimit")
 
         if (lastFetch.isBefore(fetchLimit)) {
-            withContext(Dispatchers.IO) {
-                api.fetchTopItems()
-            }
+            api.fetchTopItems()
                 .take(PAGE_SIZE)
                 .map { it.toLong() }
                 .also { topItems ->
                     db.replaceTopPosts(topItems)
 
-                    topItems.map { itemId ->
+                    topItems.mapIndexed { idx, itemId ->
                         async(Dispatchers.IO) {
-                            api
-                                .fetchItem(itemId)
-                        }
-                    }.forEachIndexed { idx, result ->
-                        val post = result.await().toPost()
 
-                        withContext(Dispatchers.Default) {
-                            db.storePost(post)
+                            val progress = idx.toFloat() / topItems.size.toFloat()
+                            progressUpdate(progress)
+                            api.fetchItem(itemId)
                         }
-
-                        val progress = idx.toFloat() / topItems.size.toFloat()
-                        progressUpdate(progress)
                     }
+                        .awaitAll()
+                        .map { it.toPost() }
+                        .also { db.storePosts(it) }
                 }
             db.savePref("lastfetch", Instant.now().epochSecond)
         }
