@@ -1,7 +1,6 @@
 package com.github.jeremyrempel.yahnapp.api.di
 
 import android.app.Application
-import android.os.Looper
 import com.github.jeremyrempel.yahnapp.api.HackerNewsApi
 import dagger.Module
 import dagger.Provides
@@ -78,12 +77,6 @@ object NetworkModule {
             withContext(Dispatchers.Default) {
                 client.get()
             }
-        }
-    }
-
-    private fun checkMainThread() {
-        require(Looper.getMainLooper() != Looper.myLooper()) {
-            "Main thread check failed"
         }
     }
 }

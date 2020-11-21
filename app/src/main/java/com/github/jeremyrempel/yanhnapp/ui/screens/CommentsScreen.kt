@@ -31,6 +31,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,20 +67,13 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
-    var data by remember { mutableStateOf<List<Comment>>(emptyList()) }
+    val data by useCase.getCommentsForPost(post.id).collectAsState(initial = emptyList())
     var loadProgress by remember { mutableStateOf(0.0f) }
 
     var errorMsgVisible by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(post.id) {
-        useCase.getCommentsForPost(post.id).collectLatest {
-            data = it
-        }
-    }
-
-    LaunchedEffect(post.id) {
-
         try {
             useCase.requestAndStoreComments(post.id) {
                 loadProgress = it

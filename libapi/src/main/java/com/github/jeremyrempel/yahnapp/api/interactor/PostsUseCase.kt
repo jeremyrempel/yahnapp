@@ -13,7 +13,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.net.URL
@@ -95,9 +94,7 @@ class PostsUseCase @Inject constructor(
     }
 
     fun selectAllPostsByRank(): Flow<List<Post>> {
-        return db
-            .selectAllPostsByRank()
-            .flowOn(Dispatchers.Default)
+        return db.selectAllPostsByRank()
     }
 
     fun markPostViewed(id: Long) {

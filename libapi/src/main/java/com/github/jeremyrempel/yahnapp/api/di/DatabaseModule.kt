@@ -8,6 +8,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -17,17 +20,23 @@ object DatabaseModule {
     @Provides
     fun providesDriver(context: Application): AndroidSqliteDriver {
         // first access will upgrade
+        checkMainThread()
         return AndroidSqliteDriver(Database.Schema, context, "yahn.db")
     }
 
     @Provides
+    @Singleton
     fun providesDatabase(driver: AndroidSqliteDriver): Database {
+        checkMainThread()
         return Database(driver)
     }
 
     @Provides
-    @Singleton
-    fun providesHnDb(database: Database): HackerNewsDb {
-        return HackerNewsDb(database)
+    fun providesHnDb(database: Provider<Database>): HackerNewsDb {
+        return HackerNewsDb {
+            withContext(Dispatchers.Default) {
+                database.get()
+            }
+        }
     }
 }
