@@ -10,6 +10,19 @@ plugins {
 
 android {
     compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 30
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 java {
@@ -31,6 +44,10 @@ dependencies {
     api "io.ktor:ktor-client-logging:${ktor_version}"
     api "io.ktor:ktor-client-encoding:${ktor_version}"
     api 'com.squareup.okhttp3:okhttp:4.9.0'
+
+    // network debug
+    debugImplementation "com.github.chuckerteam.chucker:library:3.4.0"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.4.0"
 
     // coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
