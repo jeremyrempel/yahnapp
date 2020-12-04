@@ -27,6 +27,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -106,12 +107,12 @@ fun MainScreen(
 
 @Composable
 fun ScaffoldWithContent(
-    content: @Composable () -> Unit,
     showUp: Boolean,
     @StringRes title: Int,
     navigateTo: (Screen) -> Unit,
     currentScreen: Screen,
-    onUpaction: () -> Unit
+    onUpaction: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
 
@@ -179,7 +180,7 @@ fun DrawerContent(
         )
 
         DrawerButton(
-            icon = vectorResource(id = R.drawable.ic_baseline_person_24),
+            icon = Icons.Filled.Person,
             label = "About",
             isSelected = currentScreen is Screen.About,
             action = {
@@ -196,7 +197,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Image(
-            asset = vectorResource(R.drawable.ic_logo),
+            imageVector = vectorResource(R.drawable.ic_logo),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
             modifier = modifier.size(80.dp)
         )
@@ -206,7 +207,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
 
 @Composable
 private fun DrawerButton(
-    icon: VectorAsset,
+    icon: ImageVector,
     label: String,
     isSelected: Boolean,
     action: () -> Unit,
@@ -247,7 +248,7 @@ private fun DrawerButton(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    asset = icon,
+                    imageVector = icon,
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
                 )

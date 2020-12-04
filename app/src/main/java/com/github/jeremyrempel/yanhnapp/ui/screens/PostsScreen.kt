@@ -30,8 +30,8 @@ import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
@@ -204,7 +204,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                 }
 
                 Image(
-                    asset = vectorResource(id = R.drawable.ic_baseline_comment_24),
+                    imageVector = vectorResource(id = R.drawable.ic_baseline_comment_24),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
                     modifier = imgCommentMod
                 )

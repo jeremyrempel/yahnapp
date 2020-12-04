@@ -44,8 +44,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
@@ -282,7 +282,7 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
                 )
 
                 Image(
-                    asset = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
+                    imageVector = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
                     colorFilter = ColorFilter.tint(Color.Gray),
                     // app crashes on alternate
                     modifier = Modifier.drawLayer(
