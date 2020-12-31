@@ -48,7 +48,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jeremyrempel.yahn.Comment
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
@@ -65,9 +64,14 @@ import java.time.temporal.ChronoUnit
 @ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
-fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
+fun CommentsScreen(
+    post: Post,
+    getCommentsForPost: (postId: Long) -> Flow<List<Comment>>,
+    requestAndStoreComments: suspend (postId: Long, (Float) -> Unit) -> Unit,
+    getCommentsForParent: suspend (Long) -> Flow<List<Comment>>
+) {
 
-    val data by useCase.getCommentsForPost(post.id).collectAsState(initial = emptyList())
+    val data by getCommentsForPost(post.id).collectAsState(initial = emptyList())
     var loadProgress by remember { mutableStateOf(0.0f) }
 
     var errorMsgVisible by remember { mutableStateOf(false) }
@@ -75,7 +79,7 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
 
     LaunchedEffect(post.id) {
         try {
-            useCase.requestAndStoreComments(post.id) {
+            requestAndStoreComments(post.id) {
                 loadProgress = it
             }
         } catch (e: Exception) {
@@ -101,7 +105,7 @@ fun CommentsScreen(post: Post, useCase: CommentsUseCase) {
             )
         }
 
-        CommentList(comments = data, post, useCase::getCommentsForParent)
+        CommentList(comments = data, post, getCommentsForParent)
     }
 }
 

@@ -70,7 +70,13 @@ fun MainScreen(
             is Screen.List -> {
                 ScaffoldWithContent(
                     content = {
-                        ListContent(scrollState, postsUseCase, commentsUseCase) { newScreen ->
+                        ListContent(
+                            scrollState,
+                            postsUseCase::selectAllPostsByRank,
+                            postsUseCase::requestAndStorePosts,
+                            postsUseCase::markPostViewed,
+                            commentsUseCase::markPostCommentViewed
+                        ) { newScreen ->
                             currentScreen = newScreen
                         }
                     },
@@ -83,7 +89,14 @@ fun MainScreen(
             }
             is Screen.ViewComments -> {
                 ScaffoldWithContent(
-                    content = { CommentsScreen(post = screen.post, commentsUseCase) },
+                    content = {
+                        CommentsScreen(
+                            post = screen.post,
+                            commentsUseCase::getCommentsForPost,
+                            commentsUseCase::requestAndStoreComments,
+                            commentsUseCase::getCommentsForParent
+                        )
+                    },
                     showUp = true,
                     title = R.string.comments_title,
                     navigateTo = { currentScreen = it },

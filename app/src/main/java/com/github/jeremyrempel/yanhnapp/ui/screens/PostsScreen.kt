@@ -33,13 +33,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.jeremyrempel.yahn.Post
-import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
-import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.time.Instant
 
@@ -47,11 +46,13 @@ import java.time.Instant
 @Composable
 fun ListContent(
     scrollState: LazyListState,
-    useCase: PostsUseCase,
-    commentsUseCase: CommentsUseCase,
+    selectAllPostsByRank: () -> Flow<List<Post>>,
+    requestAndStorePosts: suspend ((Float) -> Unit) -> Unit,
+    markPostViewed: (Long) -> Unit,
+    markCommentViewed: (postId: Long) -> Unit,
     navigateTo: (Screen) -> Unit
 ) {
-    val posts by useCase.selectAllPostsByRank().collectAsState(initial = emptyList())
+    val posts by selectAllPostsByRank().collectAsState(initial = emptyList())
     var loadProgress by remember { mutableStateOf(0.0f) }
 
     var errorMsgVisible by remember { mutableStateOf(false) }
@@ -59,7 +60,7 @@ fun ListContent(
 
     LaunchedEffect(1) {
         try {
-            useCase.requestAndStorePosts {
+            requestAndStorePosts {
                 loadProgress = it
             }
         } catch (e: Exception) {
@@ -92,18 +93,18 @@ fun ListContent(
                 data = posts,
                 scrollState,
                 onSelectPost = { post ->
-                    useCase.markPostViewed(post.id)
+                    markPostViewed(post.id)
 
                     val url = post.url
                     if (url != null) {
                         launchBrowser(url, context)
                     } else {
-                        commentsUseCase.markPostCommentViewed(post.id)
+                        markCommentViewed(post.id)
                         navigateTo(Screen.ViewComments(post))
                     }
                 },
                 onSelectPostComment = { post ->
-                    commentsUseCase.markPostCommentViewed(post.id)
+                    markCommentViewed(post.id)
                     navigateTo(Screen.ViewComments(post))
                 }
             )
