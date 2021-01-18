@@ -50,7 +50,7 @@ private class ComposableBackHandler(enabled: Boolean) : OnBackPressedCallback(en
 // think of composable functions to be similar to lego blocks - each composable function is in turn
 // built up of smaller composable functions.
 @Composable
-internal fun handler(
+internal fun Handler(
     enabled: Boolean = true,
     onBackPressed: () -> Unit
 ) {
@@ -102,7 +102,7 @@ internal fun BackButtonHandler(onBackPressed: () -> Unit) {
     Providers(
         AmbientBackPressedDispatcher provides LifecycleOwnerAmbient.current as ComponentActivity
     ) {
-        handler {
+        Handler {
             onBackPressed()
         }
     }
