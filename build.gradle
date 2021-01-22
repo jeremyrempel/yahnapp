@@ -8,7 +8,7 @@ buildscript {
         junit_version = "4.13.1"
         coroutines_version = "1.4.2"
         timber_version = "4.7.1"
-        dagger_version = "2.31-alpha"
+        dagger_version = "2.31.2-alpha"
     }
     repositories {
         google()
