@@ -39,12 +39,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -155,9 +153,11 @@ fun CommentTree(
         CommentLevelDivider(level = level)
 
         Column {
-            Spacer(modifier = Modifier
-                .preferredHeight(15.dp)
-                .fillMaxWidth())
+            Spacer(
+                modifier = Modifier
+                    .preferredHeight(15.dp)
+                    .fillMaxWidth()
+            )
 
             SingleComment(comment = comment)
             CommentHasMore(
@@ -269,9 +269,11 @@ private fun CommentHeader(title: String, domain: String?, date: Long, content: S
             }
         }
 
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 15.dp))
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp)
+        )
     }
 }
 
