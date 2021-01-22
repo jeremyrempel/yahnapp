@@ -121,9 +121,12 @@ fun PostsList(
     LazyColumn(
         state = scrollState
     ) {
-        items(items = data, itemContent = { row ->
-            PostRow(row, onSelectPost, onSelectPostComment)
-        })
+        items(
+            items = data,
+            itemContent = { row ->
+                PostRow(row, onSelectPost, onSelectPostComment)
+            }
+        )
     }
 }
 
