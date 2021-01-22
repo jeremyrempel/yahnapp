@@ -26,8 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,7 +90,7 @@ fun ListContent(
 
         if (posts.isNotEmpty()) {
 
-            val context = ContextAmbient.current
+            val context = AmbientContext.current
             PostsList(
                 data = posts,
                 scrollState,
@@ -199,7 +201,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
             ) {
 
                 val imgCommentMod = if (post.hasViewedComments == 1L) {
-                    Modifier.align(Alignment.CenterHorizontally).drawOpacity(readOpacity)
+                    Modifier.align(Alignment.CenterHorizontally).alpha(readOpacity)
                 } else {
                     Modifier.align(Alignment.CenterHorizontally)
                 }

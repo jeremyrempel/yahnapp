@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.unit.dp
 import com.github.jeremyrempel.yanhnapp.ui.components.HtmlText
@@ -22,7 +23,7 @@ fun AboutScreen() {
      </p>
     """.trimIndent()
 
-    val context = ContextAmbient.current
+    val context = AmbientContext.current
 
     Box(modifier = Modifier.padding(10.dp)) {
         HtmlText(html = aboutText, handleLink = { launchBrowser(url = it, context = context) })

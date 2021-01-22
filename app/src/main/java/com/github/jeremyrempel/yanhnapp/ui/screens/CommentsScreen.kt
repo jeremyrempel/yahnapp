@@ -42,6 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -153,7 +155,9 @@ fun CommentTree(
         CommentLevelDivider(level = level)
 
         Column {
-            Spacer(modifier = Modifier.preferredHeight(15.dp).fillMaxWidth())
+            Spacer(modifier = Modifier
+                .preferredHeight(15.dp)
+                .fillMaxWidth())
 
             SingleComment(comment = comment)
             CommentHasMore(
@@ -220,7 +224,7 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.subtitle1
             )
         }
-        val context = ContextAmbient.current
+        val context = AmbientContext.current
         HtmlText(html = comment.content) { url ->
             launchBrowser(url, context)
         }
@@ -247,7 +251,9 @@ private fun CommentHeader(title: String, domain: String?, date: Long, content: S
         )
 
         Row(
-            Modifier.fillMaxWidth().padding(end = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (domain != null) {
@@ -257,13 +263,15 @@ private fun CommentHeader(title: String, domain: String?, date: Long, content: S
         }
 
         if (content != null) {
-            val context = ContextAmbient.current
+            val context = AmbientContext.current
             HtmlText(html = content) { url ->
                 launchBrowser(url, context)
             }
         }
 
-        Divider(modifier = Modifier.fillMaxWidth().padding(top = 15.dp))
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 15.dp))
     }
 }
 
@@ -289,7 +297,7 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
                     imageVector = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
                     colorFilter = ColorFilter.tint(Color.Gray),
                     // app crashes on alternate
-                    modifier = Modifier.drawLayer(
+                    modifier = Modifier.graphicsLayer(
                         scaleY = animate(
                             target = if (isExpanded) -1f else 1f,
                             animSpec = TweenSpec()
@@ -307,7 +315,9 @@ fun CommentLevelDivider(level: Int, modifier: Modifier = Modifier) {
         Spacer(modifier = modifier.preferredWidth(10.dp))
         Divider(
             color = MaterialTheme.colors.secondary,
-            modifier = modifier.fillMaxHeight().preferredWidth(3.dp)
+            modifier = modifier
+                .fillMaxHeight()
+                .preferredWidth(3.dp)
         )
     }
     Spacer(modifier = modifier.preferredWidth(15.dp))
