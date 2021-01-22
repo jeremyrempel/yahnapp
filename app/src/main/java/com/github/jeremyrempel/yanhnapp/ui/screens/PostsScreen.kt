@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumnForIndexed
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
@@ -21,14 +21,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,7 +87,7 @@ fun ListContent(
 
         if (posts.isNotEmpty()) {
 
-            val context = ContextAmbient.current
+            val context = AmbientContext.current
             PostsList(
                 data = posts,
                 scrollState,
@@ -119,22 +118,18 @@ fun PostsList(
     onSelectPost: (Post) -> Unit,
     onSelectPostComment: (Post) -> Unit
 ) {
-    LazyColumnForIndexed(
-        items = data,
+    LazyColumn(
         state = scrollState
-    ) { index, row ->
-        PostRow(row, onSelectPost, onSelectPostComment)
-
-        if (data.size - 1 == index) {
-            onActive {
-                // todo implement load more
-                Timber.d("reached end. load more")
+    ) {
+        items(
+            items = data,
+            itemContent = { row ->
+                PostRow(row, onSelectPost, onSelectPostComment)
             }
-        }
+        )
     }
 }
 
-@ExperimentalCoroutinesApi
 @Composable
 fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post) -> Unit) {
 
@@ -150,7 +145,9 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
         }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 5.dp, end = 5.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, start = 5.dp, end = 5.dp)
 
     ) {
         Row {
@@ -165,7 +162,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
                 Text(
                     text = post.title,
                     style = MaterialTheme.typography.h6,
-                    modifier = if (post.hasViewedPost == 1L) Modifier.drawOpacity(readOpacity) else Modifier
+                    modifier = if (post.hasViewedPost == 1L) Modifier.alpha(readOpacity) else Modifier
                 )
 
                 Row(
@@ -199,7 +196,9 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
             ) {
 
                 val imgCommentMod = if (post.hasViewedComments == 1L) {
-                    Modifier.align(Alignment.CenterHorizontally).drawOpacity(readOpacity)
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .alpha(readOpacity)
                 } else {
                     Modifier.align(Alignment.CenterHorizontally)
                 }
@@ -216,7 +215,11 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
             }
         }
 
-        Divider(modifier = Modifier.fillMaxWidth().padding(top = 10.dp))
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp)
+        )
     }
 }
 

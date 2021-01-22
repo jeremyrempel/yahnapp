@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -32,8 +32,7 @@ fun HtmlText(html: String, handleLink: (String) -> Unit) {
     val paragraph = ParagraphStyle()
 
     val formattedString = remember(html) {
-        annotatedString {
-
+        buildAnnotatedString {
             var cursorPosition = 0
             val appendAndUpdateCursor: (String) -> Unit = {
                 append(it)
