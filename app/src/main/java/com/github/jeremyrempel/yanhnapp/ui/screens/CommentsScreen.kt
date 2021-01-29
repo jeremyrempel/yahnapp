@@ -297,14 +297,15 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 
                 Image(
                     imageVector = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
-                    colorFilter = ColorFilter.tint(Color.Gray),
+                    contentDescription = "Show More",
                     // app crashes on alternate
                     modifier = Modifier.graphicsLayer(
                         scaleY = animate(
                             target = if (isExpanded) -1f else 1f,
                             animSpec = TweenSpec()
                         )
-                    )
+                    ),
+                    colorFilter = ColorFilter.tint(Color.Gray)
                 )
             }
         }
