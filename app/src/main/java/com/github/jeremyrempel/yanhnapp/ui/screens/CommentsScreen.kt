@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -297,7 +298,7 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 
                 Image(
                     imageVector = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
-                    contentDescription = "Show More",
+                    contentDescription = stringResource(id = R.string.show_more),
                     // app crashes on alternate
                     modifier = Modifier.graphicsLayer(
                         scaleY = animate(
