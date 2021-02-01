@@ -42,7 +42,7 @@ dependencies {
     api "io.ktor:ktor-client-serialization:${ktor_version}"
     api "io.ktor:ktor-client-logging:${ktor_version}"
     api "io.ktor:ktor-client-encoding:${ktor_version}"
-    api 'com.squareup.okhttp3:okhttp:4.9.0'
+    api 'com.squareup.okhttp3:okhttp:4.9.1'
 
     // network debug
     debugImplementation "com.github.chuckerteam.chucker:library:3.4.0"
