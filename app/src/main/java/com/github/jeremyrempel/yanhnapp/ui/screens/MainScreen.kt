@@ -136,7 +136,7 @@ fun ScaffoldWithContent(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
                         IconButton(onClick = { onUpaction() }) {
-                            Icon(Icons.Filled.ArrowBack)
+                            Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.back))
                         }
                     },
                 )
@@ -155,7 +155,7 @@ fun ScaffoldWithContent(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
                         IconButton(onClick = { scaffoldState.drawerState.open() }) {
-                            Icon(Icons.Filled.Menu)
+                            Icon(Icons.Filled.Menu, stringResource(id = R.string.menu))
                         }
                     }
                 )
@@ -211,6 +211,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
     ) {
         Image(
             imageVector = vectorResource(R.drawable.ic_logo),
+            contentDescription = stringResource(id = R.string.logo),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
             modifier = modifier.size(80.dp)
         )
@@ -262,6 +263,7 @@ private fun DrawerButton(
             ) {
                 Image(
                     imageVector = icon,
+                    contentDescription = stringResource(id = R.string.drawer),
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
                 )
