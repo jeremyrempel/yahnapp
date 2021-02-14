@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -174,21 +175,21 @@ fun CommentTree(
         visible = showChildren,
         enter = slideInVertically(
             initialOffsetY = { -40 },
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + expandVertically(
             expandFrom = Alignment.Top,
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + fadeIn(
             initialAlpha = 0.3f,
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ),
         exit = slideOutVertically(
             targetOffsetY = { -40 },
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + shrinkVertically(
-            animSpec = TweenSpec()
+            animationSpec = TweenSpec()
         ) + fadeOut(
-            animSpec = TweenSpec()
+            animationSpec = TweenSpec()
         )
     ) {
         Column {
@@ -225,7 +226,7 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.subtitle1
             )
         }
-        val context = AmbientContext.current
+        val context = LocalContext.current
         HtmlText(html = comment.content) { url ->
             launchBrowser(url, context)
         }

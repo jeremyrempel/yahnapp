@@ -46,7 +46,6 @@ import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
-import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 
 sealed class Screen {
     object List : Screen()
@@ -144,9 +143,10 @@ fun ScaffoldWithContent(
             bodyContent = { content() }
         )
 
-        if (showUp) {
-            BackButtonHandler(onBackPressed = { onUpaction() })
-        }
+        // todo fix me
+        // if (showUp) {
+        //     BackButtonHandler(onBackPressed = { onUpaction() })
+        // }
     } else {
         Scaffold(
             scaffoldState = scaffoldState,

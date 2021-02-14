@@ -123,9 +123,9 @@ fun PostsList(
         state = scrollState
     ) {
         items(
-            items = data,
+            count = data.size,
             itemContent = { row ->
-                PostRow(row, onSelectPost, onSelectPostComment)
+                PostRow(data[row], onSelectPost, onSelectPostComment)
             }
         )
     }
