@@ -5,4 +5,9 @@
     <string name="comments_title">Comments</string>
     <string name="top_stories_title">Top Stories</string>
     <string name="about_title">About</string>
+    <string name="menu">Menu</string>
+    <string name="back">Back</string>
+    <string name="logo">Logo</string>
+    <string name="drawer">Drawer</string>
+    <string name="show_more">Show More</string>
 </resources>

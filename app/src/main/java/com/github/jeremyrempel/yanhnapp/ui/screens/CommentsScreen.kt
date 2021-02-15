@@ -43,6 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -173,21 +175,21 @@ fun CommentTree(
         visible = showChildren,
         enter = slideInVertically(
             initialOffsetY = { -40 },
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + expandVertically(
             expandFrom = Alignment.Top,
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + fadeIn(
             initialAlpha = 0.3f,
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ),
         exit = slideOutVertically(
             targetOffsetY = { -40 },
-            animSpec = TweenSpec(),
+            animationSpec = TweenSpec(),
         ) + shrinkVertically(
-            animSpec = TweenSpec()
+            animationSpec = TweenSpec()
         ) + fadeOut(
-            animSpec = TweenSpec()
+            animationSpec = TweenSpec()
         )
     ) {
         Column {
@@ -224,7 +226,7 @@ fun SingleComment(comment: Comment, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.subtitle1
             )
         }
-        val context = AmbientContext.current
+        val context = LocalContext.current
         HtmlText(html = comment.content) { url ->
             launchBrowser(url, context)
         }
@@ -297,14 +299,15 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 
                 Image(
                     imageVector = vectorResource(id = R.drawable.ic_baseline_expand_more_24),
-                    colorFilter = ColorFilter.tint(Color.Gray),
+                    contentDescription = stringResource(id = R.string.show_more),
                     // app crashes on alternate
                     modifier = Modifier.graphicsLayer(
                         scaleY = animate(
                             target = if (isExpanded) -1f else 1f,
                             animSpec = TweenSpec()
                         )
-                    )
+                    ),
+                    colorFilter = ColorFilter.tint(Color.Gray)
                 )
             }
         }

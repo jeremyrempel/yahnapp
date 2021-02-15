@@ -46,7 +46,6 @@ import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
-import com.github.jeremyrempel.yanhnapp.ui.BackButtonHandler
 
 sealed class Screen {
     object List : Screen()
@@ -136,7 +135,7 @@ fun ScaffoldWithContent(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
                         IconButton(onClick = { onUpaction() }) {
-                            Icon(Icons.Filled.ArrowBack)
+                            Icon(Icons.Filled.ArrowBack, stringResource(id = R.string.back))
                         }
                     },
                 )
@@ -144,9 +143,10 @@ fun ScaffoldWithContent(
             bodyContent = { content() }
         )
 
-        if (showUp) {
-            BackButtonHandler(onBackPressed = { onUpaction() })
-        }
+        // todo fix me
+        // if (showUp) {
+        //     BackButtonHandler(onBackPressed = { onUpaction() })
+        // }
     } else {
         Scaffold(
             scaffoldState = scaffoldState,
@@ -155,7 +155,7 @@ fun ScaffoldWithContent(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
                         IconButton(onClick = { scaffoldState.drawerState.open() }) {
-                            Icon(Icons.Filled.Menu)
+                            Icon(Icons.Filled.Menu, stringResource(id = R.string.menu))
                         }
                     }
                 )
@@ -211,6 +211,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
     ) {
         Image(
             imageVector = vectorResource(R.drawable.ic_logo),
+            contentDescription = stringResource(id = R.string.logo),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
             modifier = modifier.size(80.dp)
         )
@@ -262,6 +263,7 @@ private fun DrawerButton(
             ) {
                 Image(
                     imageVector = icon,
+                    contentDescription = stringResource(id = R.string.drawer),
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
                 )

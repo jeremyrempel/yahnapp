@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -122,9 +123,9 @@ fun PostsList(
         state = scrollState
     ) {
         items(
-            items = data,
+            count = data.size,
             itemContent = { row ->
-                PostRow(row, onSelectPost, onSelectPostComment)
+                PostRow(data[row], onSelectPost, onSelectPostComment)
             }
         )
     }
@@ -205,6 +206,7 @@ fun PostRow(post: Post, onSelectPost: (Post) -> Unit, onSelectPostComment: (Post
 
                 Image(
                     imageVector = vectorResource(id = R.drawable.ic_baseline_comment_24),
+                    contentDescription = stringResource(id = R.string.comments_title),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
                     modifier = imgCommentMod
                 )
