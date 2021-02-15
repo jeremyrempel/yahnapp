@@ -42,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -265,7 +264,7 @@ private fun CommentHeader(title: String, domain: String?, date: Long, content: S
         }
 
         if (content != null) {
-            val context = AmbientContext.current
+            val context = LocalContext.current
             HtmlText(html = content) { url ->
                 launchBrowser(url, context)
             }
