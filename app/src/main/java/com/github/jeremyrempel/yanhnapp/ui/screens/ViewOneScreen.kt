@@ -45,7 +45,7 @@ fun ViewOne(post: Post) {
         }
 
         if (selectedTab.value == TAB_CONTENT) {
-            ViewOneContent(post.url, post.text)
+            ViewOneContent(post.text)
         } else {
             ViewOneComments()
         }
@@ -53,7 +53,7 @@ fun ViewOne(post: Post) {
 }
 
 @Composable
-fun ViewOneContent(url: String?, text: String?) {
+fun ViewOneContent(text: String?) {
     Text(text ?: "")
 }
 
