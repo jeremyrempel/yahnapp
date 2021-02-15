@@ -39,9 +39,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
@@ -184,7 +185,7 @@ fun DrawerContent(
         Spacer(Modifier.preferredHeight(16.dp))
 
         DrawerButton(
-            icon = vectorResource(id = R.drawable.ic_baseline_trending_up_24),
+            icon = painterResource(id = R.drawable.ic_baseline_trending_up_24),
             label = "Top Stories",
             isSelected = currentScreen is Screen.List,
             action = {
@@ -193,7 +194,7 @@ fun DrawerContent(
         )
 
         DrawerButton(
-            icon = Icons.Filled.Person,
+            icon = rememberVectorPainter(image = Icons.Filled.Person),
             label = "About",
             isSelected = currentScreen is Screen.About,
             action = {
@@ -210,7 +211,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Image(
-            imageVector = vectorResource(R.drawable.ic_logo),
+            painter = painterResource(R.drawable.ic_logo),
             contentDescription = stringResource(id = R.string.logo),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
             modifier = modifier.size(80.dp)
@@ -221,7 +222,7 @@ private fun YahnLogo(modifier: Modifier = Modifier) {
 
 @Composable
 private fun DrawerButton(
-    icon: ImageVector,
+    icon: Painter,
     label: String,
     isSelected: Boolean,
     action: () -> Unit,
@@ -262,7 +263,7 @@ private fun DrawerButton(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    imageVector = icon,
+                    painter = icon,
                     contentDescription = stringResource(id = R.string.drawer),
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
