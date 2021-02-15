@@ -1,5 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -143,10 +144,9 @@ fun ScaffoldWithContent(
             bodyContent = { content() }
         )
 
-        // todo fix me
-        // if (showUp) {
-        //     BackButtonHandler(onBackPressed = { onUpaction() })
-        // }
+        if (showUp) {
+            BackHandler(onBack = { onUpaction() })
+        }
     } else {
         Scaffold(
             scaffoldState = scaffoldState,
