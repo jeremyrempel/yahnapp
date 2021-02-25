@@ -13,7 +13,6 @@ buildscript {
     }
     repositories {
         google()
-        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.0-alpha07'
@@ -32,7 +31,6 @@ plugins {
 allprojects {
     repositories {
         google()
-        jcenter()
     }
 }
 
