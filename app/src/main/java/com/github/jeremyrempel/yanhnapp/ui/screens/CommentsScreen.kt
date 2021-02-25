@@ -312,7 +312,6 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
     }
 }
 
-
 @Composable
 fun CommentLevelDivider(level: Int, modifier: Modifier = Modifier) {
     for (i in 0 until level) {
