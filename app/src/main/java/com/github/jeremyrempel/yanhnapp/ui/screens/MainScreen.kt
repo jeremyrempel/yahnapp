@@ -7,13 +7,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
@@ -55,7 +53,6 @@ sealed class Screen {
     object About : Screen()
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun MainScreen(
@@ -142,7 +139,7 @@ fun ScaffoldWithContent(
                     },
                 )
             },
-            bodyContent = { content() }
+            content = { content() }
         )
 
         if (showUp) {
@@ -164,7 +161,7 @@ fun ScaffoldWithContent(
             drawerContent = {
                 DrawerContent(navigateTo = navigateTo, currentScreen = currentScreen)
             },
-            bodyContent = { content() }
+            content = { content() }
         )
     }
 }
@@ -180,9 +177,9 @@ fun DrawerContent(
     ) {
 
         YahnLogo(modifier = Modifier.padding(16.dp))
-        Spacer(Modifier.preferredHeight(16.dp))
+        Spacer(Modifier.height(16.dp))
         Divider(color = MaterialTheme.colors.onSurface.copy(alpha = .2f))
-        Spacer(Modifier.preferredHeight(16.dp))
+        Spacer(Modifier.height(16.dp))
 
         DrawerButton(
             icon = painterResource(id = R.drawable.ic_baseline_trending_up_24),
