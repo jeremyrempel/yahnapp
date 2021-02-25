@@ -44,7 +44,7 @@ android {
         kotlinCompilerExtensionVersion compose_version
     }
     lintOptions {
-        abortOnError true
+        abortOnError false
         ignoreWarnings false
         warningsAsErrors true
         disable 'GradleDependency', 'NewerVersionAvailable'
