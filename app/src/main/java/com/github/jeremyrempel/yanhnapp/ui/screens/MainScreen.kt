@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
+import kotlinx.coroutines.launch
 
 sealed class Screen {
     object List : Screen()
@@ -127,6 +129,7 @@ fun ScaffoldWithContent(
     content: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
     if (showUp) {
         Scaffold(
@@ -154,7 +157,7 @@ fun ScaffoldWithContent(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
                         // todo fix this
-                        IconButton(onClick = { /* scaffoldState.drawerState.open() */ }) {
+                        IconButton(onClick = { coroutineScope.launch { scaffoldState.drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, stringResource(id = R.string.menu))
                         }
                     }
