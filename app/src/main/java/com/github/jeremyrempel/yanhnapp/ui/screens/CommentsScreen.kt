@@ -314,12 +314,12 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 @Composable
 fun CommentLevelDivider(level: Int, modifier: Modifier = Modifier) {
     for (i in 0 until level) {
-        Spacer(modifier = modifier.height(10.dp))
+        Spacer(modifier = modifier.width(10.dp))
         Divider(
             color = MaterialTheme.colors.secondary,
             modifier = modifier
                 .fillMaxHeight()
-                .height(3.dp)
+                .width(3.dp)
         )
     }
     Spacer(modifier = modifier.width(15.dp))
