@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -152,7 +153,8 @@ fun ScaffoldWithContent(
                 TopAppBar(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
-                        IconButton(onClick = { scaffoldState.drawerState.open() }) {
+                        // todo fix this
+                        IconButton(onClick = { /* scaffoldState.drawerState.open() */ }) {
                             Icon(Icons.Filled.Menu, stringResource(id = R.string.menu))
                         }
                     }
@@ -265,7 +267,7 @@ private fun DrawerButton(
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
                 )
-                Spacer(Modifier.preferredWidth(16.dp))
+                Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
                     style = MaterialTheme.typography.body2,

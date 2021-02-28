@@ -4,7 +4,7 @@ import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -295,15 +295,14 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
+                val arrowDirection: Float by animateFloatAsState(if (isExpanded) -1f else 1f)
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_baseline_expand_more_24),
                     contentDescription = stringResource(id = R.string.show_more),
                     // app crashes on alternate
                     modifier = Modifier.graphicsLayer(
-                        scaleY = animate(
-                            targetValue = if (isExpanded) -1f else 1f,
-                            animationSpec = TweenSpec()
-                        )
+                        scaleY = arrowDirection
                     ),
                     colorFilter = ColorFilter.tint(Color.Gray)
                 )

@@ -37,12 +37,10 @@ import com.github.jeremyrempel.yanhnapp.R
 import com.github.jeremyrempel.yanhnapp.ui.SampleData
 import com.github.jeremyrempel.yanhnapp.ui.theme.YetAnotherHNAppTheme
 import com.github.jeremyrempel.yanhnapp.util.launchBrowser
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.time.Instant
 
-@ExperimentalCoroutinesApi
 @Composable
 fun ListContent(
     scrollState: LazyListState,
