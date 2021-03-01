@@ -7,14 +7,13 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -34,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +48,7 @@ import com.github.jeremyrempel.yahn.Post
 import com.github.jeremyrempel.yahnapp.api.interactor.CommentsUseCase
 import com.github.jeremyrempel.yahnapp.api.interactor.PostsUseCase
 import com.github.jeremyrempel.yanhnapp.R
+import kotlinx.coroutines.launch
 
 sealed class Screen {
     object List : Screen()
@@ -55,7 +56,6 @@ sealed class Screen {
     object About : Screen()
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun MainScreen(
@@ -129,6 +129,7 @@ fun ScaffoldWithContent(
     content: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
     if (showUp) {
         Scaffold(
@@ -142,7 +143,7 @@ fun ScaffoldWithContent(
                     },
                 )
             },
-            bodyContent = { content() }
+            content = { content() }
         )
 
         if (showUp) {
@@ -155,7 +156,8 @@ fun ScaffoldWithContent(
                 TopAppBar(
                     title = { Text(stringResource(title)) },
                     navigationIcon = {
-                        IconButton(onClick = { scaffoldState.drawerState.open() }) {
+                        // todo fix this
+                        IconButton(onClick = { coroutineScope.launch { scaffoldState.drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, stringResource(id = R.string.menu))
                         }
                     }
@@ -164,7 +166,7 @@ fun ScaffoldWithContent(
             drawerContent = {
                 DrawerContent(navigateTo = navigateTo, currentScreen = currentScreen)
             },
-            bodyContent = { content() }
+            content = { content() }
         )
     }
 }
@@ -180,9 +182,9 @@ fun DrawerContent(
     ) {
 
         YahnLogo(modifier = Modifier.padding(16.dp))
-        Spacer(Modifier.preferredHeight(16.dp))
+        Spacer(Modifier.height(16.dp))
         Divider(color = MaterialTheme.colors.onSurface.copy(alpha = .2f))
-        Spacer(Modifier.preferredHeight(16.dp))
+        Spacer(Modifier.height(16.dp))
 
         DrawerButton(
             icon = painterResource(id = R.drawable.ic_baseline_trending_up_24),
@@ -268,7 +270,7 @@ private fun DrawerButton(
                     colorFilter = ColorFilter.tint(textIconColor),
                     alpha = imageAlpha
                 )
-                Spacer(Modifier.preferredWidth(16.dp))
+                Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,
                     style = MaterialTheme.typography.body2,

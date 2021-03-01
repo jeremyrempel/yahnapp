@@ -1,6 +1,6 @@
 package com.github.jeremyrempel.yanhnapp.ui.components
 
-import androidx.compose.foundation.ClickableText
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
