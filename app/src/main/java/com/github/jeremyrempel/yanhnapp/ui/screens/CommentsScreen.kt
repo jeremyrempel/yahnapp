@@ -3,8 +3,8 @@ package com.github.jeremyrempel.yanhnapp.ui.screens
 import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animate
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,15 +14,14 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
@@ -63,7 +62,6 @@ import timber.log.Timber
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun CommentsScreen(
@@ -111,7 +109,6 @@ fun CommentsScreen(
     }
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun CommentList(
@@ -135,7 +132,6 @@ fun CommentList(
     }
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Composable
 fun CommentTree(
@@ -153,13 +149,13 @@ fun CommentTree(
         }
     }
 
-    Row(modifier = Modifier.preferredHeight(IntrinsicSize.Min)) {
+    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
         CommentLevelDivider(level = level)
 
         Column {
             Spacer(
                 modifier = Modifier
-                    .preferredHeight(15.dp)
+                    .height(15.dp)
                     .fillMaxWidth()
             )
 
@@ -299,15 +295,14 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
+                val arrowDirection: Float by animateFloatAsState(if (isExpanded) -1f else 1f)
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_baseline_expand_more_24),
                     contentDescription = stringResource(id = R.string.show_more),
                     // app crashes on alternate
                     modifier = Modifier.graphicsLayer(
-                        scaleY = animate(
-                            target = if (isExpanded) -1f else 1f,
-                            animSpec = TweenSpec()
-                        )
+                        scaleY = arrowDirection
                     ),
                     colorFilter = ColorFilter.tint(Color.Gray)
                 )
@@ -319,15 +314,15 @@ fun CommentHasMore(count: Long, isExpanded: Boolean, onClick: () -> Unit) {
 @Composable
 fun CommentLevelDivider(level: Int, modifier: Modifier = Modifier) {
     for (i in 0 until level) {
-        Spacer(modifier = modifier.preferredWidth(10.dp))
+        Spacer(modifier = modifier.width(10.dp))
         Divider(
             color = MaterialTheme.colors.secondary,
             modifier = modifier
                 .fillMaxHeight()
-                .preferredWidth(3.dp)
+                .width(3.dp)
         )
     }
-    Spacer(modifier = modifier.preferredWidth(15.dp))
+    Spacer(modifier = modifier.width(15.dp))
 }
 
 @Preview(showBackground = true)
@@ -357,7 +352,6 @@ fun SingleCommentPreview() {
     SingleComment(comment = SampleData.commentList.first())
 }
 
-@ExperimentalLayout
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable

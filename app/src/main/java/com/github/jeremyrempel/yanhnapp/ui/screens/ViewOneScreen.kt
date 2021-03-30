@@ -2,8 +2,7 @@ package com.github.jeremyrempel.yanhnapp.ui.screens
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
@@ -23,13 +22,12 @@ const val TAB_CONTENT = 0
 const val TAB_COMMENTS = 1
 
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
 fun ViewOne(post: Post) {
     val selectedTab = remember { mutableStateOf(TAB_CONTENT) }
 
     Column {
-        TabRow(selectedTabIndex = selectedTab.value, modifier = Modifier.preferredHeight(48.dp)) {
+        TabRow(selectedTabIndex = selectedTab.value, modifier = Modifier.height(48.dp)) {
             Tab(
                 selected = selectedTab.value == TAB_CONTENT,
                 onClick = { selectedTab.value = TAB_CONTENT }
@@ -58,14 +56,12 @@ fun ViewOneContent(text: String?) {
 }
 
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Composable
 fun ViewOneComments() {
     // CommentPreview()
 }
 
 @ExperimentalAnimationApi
-@ExperimentalLayout
 @Preview(showBackground = true)
 @Composable
 fun ViewOnePreview() {
