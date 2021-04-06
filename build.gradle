@@ -4,7 +4,7 @@ buildscript {
         compose_version = '1.0.0-beta03'
         kotlin_version = "1.4.31"
         serialization_version = "1.0.1"
-        ktor_version = "1.4.1"
+        ktor_version = "1.5.3"
         junit_version = "4.13.2"
         coroutines_version = "1.4.2"
         timber_version = "4.7.1"
