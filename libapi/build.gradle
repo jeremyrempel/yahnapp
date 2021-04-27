@@ -56,7 +56,7 @@ dependencies {
 
     // database
     api 'com.squareup.sqldelight:coroutines-extensions:1.5.0'
-    api 'com.squareup.sqldelight:android-driver:1.4.4'
+    api 'com.squareup.sqldelight:android-driver:1.5.0'
 
     // dagger
     implementation "com.google.dagger:hilt-android:$dagger_version"
