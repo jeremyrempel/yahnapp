@@ -2,7 +2,7 @@
 buildscript {
     ext {
         compose_version = '1.0.0-beta05'
-        kotlin_version = "1.4.31"
+        kotlin_version = "1.4.32"
         serialization_version = "1.2.0"
         ktor_version = "1.5.4"
         junit_version = "4.13.2"
@@ -16,7 +16,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.0-alpha13'
+        classpath 'com.android.tools.build:gradle:7.0.0-alpha15'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
 
