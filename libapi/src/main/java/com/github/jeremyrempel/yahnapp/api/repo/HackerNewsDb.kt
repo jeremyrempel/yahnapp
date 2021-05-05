@@ -23,18 +23,14 @@ class HackerNewsDb(
     fun selectAllPostsByRank(): Flow<List<Post>> {
         return flow {
             val db = provideDatabase()
-            withContext(Dispatchers.Default) {
-                emitAll(db.topPostsQueries.selectPostsByRank().asFlow().mapToList())
-            }
+            emitAll(db.topPostsQueries.selectPostsByRank().asFlow().mapToList())
         }.flowOn(Dispatchers.Default)
     }
 
     fun selectCommentsByPost(id: Long): Flow<List<Comment>> {
         return flow {
             val db = provideDatabase()
-            withContext(Dispatchers.Default) {
-                emitAll(db.commentQueries.selectCommentsByPost(id).asFlow().mapToList())
-            }
+            emitAll(db.commentQueries.selectCommentsByPost(id).asFlow().mapToList())
         }.flowOn(Dispatchers.Default)
     }
 
