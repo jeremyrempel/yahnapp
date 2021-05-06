@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-kapt'
 
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
-    id 'com.squareup.sqldelight' version "1.4.4"
+    id 'com.squareup.sqldelight' version "1.5.0"
 }
 
 android {
@@ -55,8 +55,8 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
 
     // database
-    api 'com.squareup.sqldelight:coroutines-extensions:1.4.4'
-    api 'com.squareup.sqldelight:android-driver:1.4.4'
+    api 'com.squareup.sqldelight:coroutines-extensions:1.5.0'
+    api 'com.squareup.sqldelight:android-driver:1.5.0'
 
     // dagger
     implementation "com.google.dagger:hilt-android:$dagger_version"
