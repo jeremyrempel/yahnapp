@@ -6,7 +6,7 @@ buildscript {
         serialization_version = "1.2.1"
         ktor_version = "1.5.4"
         junit_version = "4.13.2"
-        coroutines_version = "1.4.3-native-mt"
+        coroutines_version = "1.5.0-native-mt"
         timber_version = "4.7.1"
         dagger_version = "2.35.1"
         activity_version = "1.3.0-alpha07"
