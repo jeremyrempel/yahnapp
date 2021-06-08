@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X7 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="500px" height="500px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 500000 500000"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil2 {fill:none}
+    .fil1 {fill:#D35400}
+    .fil0 {fill:#EF6C00}
+   ]]>
+  </style>
+   <clipPath id="id0">
+    <path d="M0 -1l500001 0 0 500001 -500001 0 0 -500001z"/>
+   </clipPath>
+     <mask id="id1">
+  <linearGradient id="id2" gradientUnits="userSpaceOnUse" x1="187147" y1="187706" x2="401910" y2="375287">
+   <stop offset="0" style="stop-opacity:1; stop-color:white"/>
+   <stop offset="1" style="stop-opacity:0; stop-color:white"/>
+  </linearGradient>
+      <rect style="fill:url(#id2)" x="163016" y="136953" width="263026" height="289089"/>
+     </mask>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g>
+  </g>
+  <g style="clip-path:url(#id0)">
+   <g>
+    <rect class="fil0" x="75000" y="74998" width="350001" height="350001" rx="50000" ry="50000"/>
+    <path class="fil1" style="mask:url(#id1)" d="M425001 269839l0 105160c0,27501 -22500,50001 -50001,50001l-145589 0 -64030 -64030c-98,-89 -193,-183 -282,-281l-6 -8c-643,-708 -1035,-1651 -1035,-2679l0 -92527c0,-2203 1796,-3999 3999,-3999l12212 0c1412,0 2658,739 3369,1849l37973 37973 1290 0 0 -35823c0,-1860 1281,-3431 3006,-3874l-23845 -23844c-1000,-729 -1653,-1909 -1653,-3237l0 -33479 -31410 -57120c-701,-1274 -678,-2712 61,-3962 741,-1252 1989,-1964 3443,-1964l13989 0c1440,0 2685,703 3415,1915l27186 27186 14000 -26946c706,-1358 2018,-2155 3549,-2155l13860 0c782,0 1504,205 2119,590l32 -47 215 215c306,225 582,501 820,819l18653 18654 6743 -17659c603,-1580 2044,-2572 3736,-2572l10670 0c1162,0 2206,468 2941,1274l130570 130570zm-240733 71667l120 -120 -120 -133 0 253z"/>
+   </g>
+  </g>
+  <polygon class="fil2" points="0,-1 500001,-1 500001,500000 0,500000 "/>
+ </g>
+</svg>
