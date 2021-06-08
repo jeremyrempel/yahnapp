@@ -2,7 +2,7 @@
 buildscript {
     ext {
         compose_version = '1.0.0-beta07'
-        kotlin_version = "1.4.32"
+        kotlin_version = "1.5.10"
         serialization_version = "1.2.1"
         ktor_version = "1.6.0"
         junit_version = "4.13.2"
