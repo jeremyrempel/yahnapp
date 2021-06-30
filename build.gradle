@@ -4,12 +4,12 @@ buildscript {
         compose_version = '1.0.0-beta09'
         kotlin_version = "1.5.10"
         serialization_version = "1.2.1"
-        ktor_version = "1.6.0"
+        ktor_version = "1.6.1"
         junit_version = "4.13.2"
         coroutines_version = "1.5.0-native-mt"
         timber_version = "4.7.1"
         dagger_version = "2.36"
-        activity_version = "1.3.0-beta01"
+        activity_version = "1.3.0-beta02"
     }
     repositories {
         google()
