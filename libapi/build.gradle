@@ -45,7 +45,7 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:4.9.1'
 
     // network debug
-    debugImplementation "com.github.chuckerteam.chucker:library:3.4.0"
+    debugImplementation "com.github.chuckerteam.chucker:library:3.5.0"
     releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.0"
 
     // coroutine
