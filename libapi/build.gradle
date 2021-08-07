@@ -46,7 +46,7 @@ dependencies {
 
     // network debug
     debugImplementation "com.github.chuckerteam.chucker:library:3.5.0"
-    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.0"
+    releaseImplementation "com.github.chuckerteam.chucker:library-no-op:3.5.2"
 
     // coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}"
