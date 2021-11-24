@@ -55,7 +55,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
 
     // database
-    api 'com.squareup.sqldelight:coroutines-extensions:1.5.1'
+    api 'com.squareup.sqldelight:coroutines-extensions:1.5.3'
     api 'com.squareup.sqldelight:android-driver:1.5.3'
 
     // dagger
