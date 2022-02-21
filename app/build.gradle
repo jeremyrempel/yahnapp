@@ -61,7 +61,7 @@ dependencies {
     // androidx
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "androidx.activity:activity-ktx:$activity_version"
-    implementation 'androidx.browser:browser:1.3.0'
+    implementation 'androidx.browser:browser:1.4.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
 
     // material
@@ -80,7 +80,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
 
     // other
-    implementation 'org.jsoup:jsoup:1.14.2'
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     // dagger
     implementation "com.google.dagger:hilt-android:$dagger_version"
