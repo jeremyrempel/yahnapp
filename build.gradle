@@ -8,7 +8,7 @@ buildscript {
         junit_version = "4.13.2"
         coroutines_version = "1.5.2"
         timber_version = "5.0.1"
-        dagger_version = "2.40.2"
+        dagger_version = "2.41"
         activity_version = "1.4.0"
     }
     repositories {
