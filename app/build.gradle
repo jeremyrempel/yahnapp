@@ -80,7 +80,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
 
     // other
-    implementation 'org.jsoup:jsoup:1.14.2'
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     // dagger
     implementation "com.google.dagger:hilt-android:$dagger_version"
